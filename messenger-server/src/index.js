@@ -1,3 +1,4 @@
+require('@babel/polyfill')
 const Koa = require('koa')
 const Router = require('koa-router')
 const logger = require('koa-logger')
