@@ -4,6 +4,7 @@ const Router = require('koa-router')
 const logger = require('koa-logger')
 const statics = require('koa-static')
 const bodyparser = require('koa-bodyparser')
+const dbserver = require('./db/DBServer')
 
 const api = require('./route')
 
@@ -20,3 +21,4 @@ app.use(router.routes()).use(router.allowedMethods())
 app.listen(3000, () => {
     console.log("Server is running at port 3000.")
 })
+dbserver.start()
