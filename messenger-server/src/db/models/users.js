@@ -5,12 +5,12 @@ const Schema = mongoose.Schema
 //index:是否索引，注意唯一索引unique的寫法
 //default:默認值
 const users = new Schema({
-    "username": { type: String, index: { unique: true, dropDups: true }, minlength: 8, maxlength: 30 },
-    "password": { type: String, match: /\w+/, index: true, minlength: 8, maxlength: 30 },
+    "username": { type: String, index: { unique: true, dropDups: true }, minlength: 3, maxlength: 30 },
+    "password": { type: String, match: /\w+/, index: true},
     "avatar": { type: String, index: true, default: '' },
     "nickname": { type: String, index: true, default: '' },
-    "privatekey": { type: String, index: true },
-    "publickey": { type: String, index: true },
+    "privateKey": { type: String, index: true },
+    "publicKey": { type: String, index: true },
 })
 
 //靜態方法，按用戶名查找，因為 username 加了唯一索引，
