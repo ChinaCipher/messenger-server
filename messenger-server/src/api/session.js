@@ -12,6 +12,4 @@ router.get('/', async ctx => {
     ctx.body = { code: ctx.session.code }
 })
 
-module.exports = {
-    router
-}
+module.exports = router
