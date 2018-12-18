@@ -6,7 +6,7 @@ const Schema = mongoose.Schema
 //default:默認值
 const users = new Schema({
     "username": { type: String, index: { unique: true, dropDups: true }, minlength: 8, maxlength: 30},
-    "password": { type: String, match: /\w+/, index: true },
+    "password": { type: String, match: /\w+/, index: true, minlength: 8, maxlength: 30},
     "avatar": {type: String, index: true, default: ''},
     "nickname": {type: String, index: true, default: ''},
     "privatekey": { type: String, index: true },
