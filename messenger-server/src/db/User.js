@@ -44,12 +44,8 @@ class User {
         return this._avatar
     }
 
-    static async _findUser(username) {
-        return await users.findByUsername(username)
-    }
-
     static async _update(username, value, opction) {
-        await users.update({username}, {'$set': {[opction]: value}})
+        await users.update({ username }, { '$set': { [opction]: value } })
     }
 
     static async find(username) {
@@ -58,10 +54,10 @@ class User {
     }
 
     static async create(user) {
-        await users(user).save(err=> {
-            if(err) throw new Error(err)
+        await users(user).save(err => {
+            if (err) throw new Error(err)
         })
-    }    
+    }
 }
 
 module.exports = User
