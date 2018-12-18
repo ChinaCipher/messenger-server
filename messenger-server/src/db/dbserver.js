@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-function start() {
+function connect() {
     const connString = 'mongodb://localhost:27017/herher'
     mongoose.connect(connString, { /*config: { autoIndex: false }*/ })
 
@@ -28,5 +28,5 @@ function start() {
     })
 }
 module.exports = {
-    start
+    connect
 }
