@@ -44,7 +44,7 @@ class User {
         return this._avatar
     }
 
-    static async findUser(username) {
+    static async _findUser(username) {
         return await users.findByUsername(username)
     }
 
@@ -52,6 +52,14 @@ class User {
         await users.update({username}, {'$set': {[opction]: value}})
     }
 
+    static async find(username) {
+        let user = await users.findByUsername(username)
+        return new User(user)
+    }
+
+    static async create(user) {
+        await users(user).save()
+    }    
 }
 
 module.exports = User
