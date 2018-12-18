@@ -8,21 +8,22 @@ const bodyparser = require('koa-bodyparser')
 
 const dbserver = require('./db/dbserver')
 const api = require('./route')
+const config = require('./config')
 
 const app = new Koa()
 const router = new Router()
 
-app.keys = ['wasaywasay']
+app.keys = config.app.keys
 
 app.use(logger())
 app.use(bodyparser())
 app.use(statics(__dirname + '/../public'))
 app.use(session({
-    key: 'koa:sess', /** (string) cookie key (default is koa:sess) */
+    key: config.session.key, /** (string) cookie key (default is koa:sess) */
     /** (number || 'session') maxAge in ms (default is 1 days) */
     /** 'session' will result in a cookie that expires when session/browser is closed */
     /** Warning: If a session cookie is stolen, this cookie will never expire */
-    maxAge: 86400000,
+    maxAge: config.session.maxAge,
     autoCommit: true, /** (boolean) automatically commit headers (default true) */
     overwrite: true, /** (boolean) can overwrite or not (default true) */
     httpOnly: true, /** (boolean) httpOnly or not (default true) */
@@ -36,6 +37,6 @@ dbserver.connect()
 router.use('/api', api.router.routes(), api.router.allowedMethods())
 app.use(router.routes()).use(router.allowedMethods())
 
-app.listen(3000, () => {
-    console.log("Server is running at port 3000.")
+app.listen(config.app.port, () => {
+    console.log(`Server is running at port ${config.app.port}.`)
 })
