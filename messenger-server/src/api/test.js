@@ -5,7 +5,10 @@ const router = new Router()
 
 
 router.get('/', async ctx => {
-    let zxjte9411 = new db.User(await db.init('zxjte9411'))
+    let doc = await db.findUser('zxjte9411')
+    console.log(doc)
+    let zxjte9411 = new db(doc)
+    // zxjte9411.username = 'zxjte9411'
     ctx.body = JSON.stringify(zxjte9411, undefined, 2)
     // ctx.body = {message: "Hello China!"}
 })
