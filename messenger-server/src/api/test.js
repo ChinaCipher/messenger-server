@@ -4,7 +4,10 @@ const router = new Router()
 
 
 router.get('/', async ctx => {
-    ctx.body = {message: "Hello China!"}
+    ctx.body = {
+        version: "v1.0.0",
+        message: "Hello China!"
+    }
 })
 
 module.exports = {
