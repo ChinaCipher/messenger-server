@@ -45,7 +45,7 @@ class User {
     }
 
     static async findUser(username) {
-        return await users.findByUsername(username/*, User.callback*/)
+        return await users.findByUsername(username)
     }
 
     static async _update(username, value, opction) {
