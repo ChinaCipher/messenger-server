@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 function connect() {
-    const connString = 'mongodb://localhost:27017/herher'
+    const connString = 'mongodb://localhost:27017/CCM'
     mongoose.connect(connString, { /*config: { autoIndex: false }*/ })
 
     // MongoDB 連接成功後回調，這裡僅輸出一行日誌
