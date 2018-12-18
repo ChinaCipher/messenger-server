@@ -5,7 +5,7 @@ const Schema = mongoose.Schema
 //index:是否索引，注意唯一索引unique的寫法
 //default:默認值
 const users = new Schema({
-    "username": { type: String, index: { unique: true, dropDups: true }, minlength: 8, maxlength: 30},
+    "username": { type: String, index: {unique: true, dropDups: true}, minlength: 8, maxlength: 30},
     "password": { type: String, match: /\w+/, index: true, minlength: 8, maxlength: 30},
     "avatar": {type: String, index: true, default: ''},
     "nickname": {type: String, index: true, default: ''},
