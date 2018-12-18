@@ -19,17 +19,14 @@ app.use(logger())
 app.use(bodyparser())
 app.use(statics(__dirname + '/../public'))
 app.use(session({
-    key: config.session.key, /** (string) cookie key (default is koa:sess) */
-    /** (number || 'session') maxAge in ms (default is 1 days) */
-    /** 'session' will result in a cookie that expires when session/browser is closed */
-    /** Warning: If a session cookie is stolen, this cookie will never expire */
+    key: config.session.key,
     maxAge: config.session.maxAge,
-    autoCommit: true, /** (boolean) automatically commit headers (default true) */
-    overwrite: true, /** (boolean) can overwrite or not (default true) */
-    httpOnly: true, /** (boolean) httpOnly or not (default true) */
-    signed: true, /** (boolean) signed or not (default true) */
-    rolling: false, /** (boolean) Force a session identifier cookie to be set on every response. The expiration is reset to the original maxAge, resetting the expiration countdown. (default is false) */
-    renew: false, /** (boolean) renew session when session is nearly expired, so we can always keep user logged in. (default is false)*/
+    autoCommit: true,
+    overwrite: true,
+    httpOnly: true,
+    signed: true,
+    rolling: false,
+    renew: false,
 }, app))
 
 dbserver.connect()
