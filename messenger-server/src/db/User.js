@@ -17,18 +17,18 @@ class User {
     }
 
     set nickname(value) {
-        this._nickname = value
         User._update(this._username, value, 'nickname')
+        this._nickname = value
     }
 
     set password(value) {
-        this._password = value
         User._update(this._username, value, 'password')
+        this._password = value
     }
 
     set avatar(value) {
-        this._avatar = value
         User._update(this._username, value, 'avatar')
+        this._avatar = value
     }
 
     get username() {
