@@ -66,6 +66,7 @@ router.post('/', async ctx => {
 
 router.get('/:username', async ctx => {
     let username = ctx.params.username
+
     let user = await User.find(username)
 
     if (!user) {
