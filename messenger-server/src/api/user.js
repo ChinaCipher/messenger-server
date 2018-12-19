@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs')
 const Router = require('koa-router')
 
 const User = require('../db/user')
+const ec = require('../util/ec')
+const aes = require('../util/aes')
 const sha256 = require('../util/sha256')
 
 const router = new Router()
@@ -20,18 +22,26 @@ router.post('/', async ctx => {
         return
     }
 
-    let salt = '$2b$10$' + sha256.hash(username).slice(0, 22)
-    let password = await bcrypt.hash(secret, salt)
+    let password = await bcrypt.hash(secret, '$2b$10$' + sha256.hash(username).slice(0, 22))
 
-    let publicKey = 'wow'
-    let privateKey = 'yee'
+    let nickname = username
+
+    let avatar = "https://herher.ntut.com.tw/img/dolphin.png"
+
+    let pair = ec.generateKeyPair()
+    
+    let publicKey = pair.publicKey
+    
+    let key = sha256.hash(password).slice(0, 32)
+    let iv = sha256.hash(username).slice(0, 16)
+    let privateKey = aes.encrypt(pair.privateKey, key, iv)
 
     try {
         await User.create({
             username,
             password,
-            nickname: username,
-            avatar: "https://herher.ntut.com.tw/img/dolphin.png",
+            nickname,
+            avatar,
             publicKey,
             privateKey,
         })
