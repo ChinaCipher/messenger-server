@@ -9,6 +9,8 @@ class User {
         this._username = user.username
         this._password = user.password
         this._avatar = user.avatar
+        this._publicKey = user.publicKey
+        this._privateKey = user.privateKey
     }
 
     set username(value) {
@@ -31,6 +33,16 @@ class User {
         this._avatar = value
     }
 
+    set publicKey(value) {
+        User._update(this._username, value, 'publicKey')
+        this._publicKey = value
+    }
+
+    set privateKey(value) {
+        User._update(this._username, value, 'privateKey')
+        this._privateKey = value
+    }
+
     get username() {
         return this._username
     }
@@ -43,6 +55,12 @@ class User {
     get avatar() {
         return this._avatar
     }
+    get publicKey() {
+        return this._publicKey
+    }
+    get privateKey() {
+        return this._privateKey
+    }
 
     static async _update(username, value, opction) {
         await users.update({ username }, { '$set': { [opction]: value } })
@@ -50,13 +68,14 @@ class User {
 
     static async find(username) {
         let user = await users.findByUsername(username)
+        if (!user) {
+            return null
+        }
         return new User(user)
     }
 
     static async create(user) {
-        await users(user).save(err => {
-            if (err) throw new Error(err)
-        })
+        await users(user).save()
     }
 }
 
