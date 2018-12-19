@@ -22,6 +22,14 @@ router.post('/', async ctx => {
         return
     }
 
+    if (!secret || (secret.length < 8) || (secret.length > 30)) {
+        ctx.body = {
+            message: "password must be longer than 3 and shorter than 30."
+        }
+        ctx.status = 401
+        return
+    }
+
     let password = await bcrypt.hash(secret, '$2b$10$' + sha256.hash(username).slice(0, 22))
 
     let nickname = username
