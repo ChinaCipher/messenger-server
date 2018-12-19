@@ -143,8 +143,8 @@ router.patch('/:username', async ctx => {
 
 router.patch('/:username/password', async ctx => {
     let username = ctx.params.username
-    let oldPassword = ctx.request.body.oldPassword
-    let newPassword = ctx.request.body.newPassword
+    let oldSecret = ctx.request.body.oldSecret
+    let newSecret = ctx.request.body.newSecret
 
     let user = await User.find(username)
 
@@ -172,7 +172,7 @@ router.patch('/:username/password', async ctx => {
         return
     }
 
-    oldPassword = await bcrypt.hash(oldPassword, '$2b$10$' + sha256.hash(username).slice(0, 22))
+    let oldPassword = await bcrypt.hash(oldSecret, '$2b$10$' + sha256.hash(username).slice(0, 22))
     if (oldPassword != user.password) {
         ctx.body = {
             message: "old password is wrong."
@@ -181,7 +181,7 @@ router.patch('/:username/password', async ctx => {
         return
     }
 
-    if (!newPassword || (newPassword.length < 8) || (newPassword.length > 30)) {
+    if (!newSecret || (newSecret.length < 8) || (newSecret.length > 30)) {
         ctx.body = {
             message: "password must be longer than 3 and shorter than 30."
         }
@@ -189,13 +189,13 @@ router.patch('/:username/password', async ctx => {
         return
     }
 
-    user.password = await bcrypt.hash(newPassword, '$2b$10$' + sha256.hash(username).slice(0, 22))
+    user.password = await bcrypt.hash(newSecret, '$2b$10$' + sha256.hash(username).slice(0, 22))
 
-    let key = sha256.hash(oldPassword).slice(0, 32)
+    let key = sha256.hash(oldSecret).slice(0, 32)
     let iv = sha256.hash(username).slice(0, 16)
     let originalPrivateKey = aes.decrypt(user.privateKey, key, iv)
 
-    key = sha256.hash(newPassword).slice(0, 32)
+    key = sha256.hash(newSecret).slice(0, 32)
     user.privateKey = aes.encrypt(originalPrivateKey, key, iv)
 
     ctx.status = 204
