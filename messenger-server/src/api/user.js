@@ -173,6 +173,14 @@ router.patch('/:username/password', async ctx => {
         return
     }
 
+    if (!newPassword || (newPassword.length < 8) || (newPassword.length > 30)) {
+        ctx.body = {
+            message: "password must be longer than 3 and shorter than 30."
+        }
+        ctx.status = 401
+        return
+    }
+
     user.password = await bcrypt.hash(newPassword, '$2b$10$' + sha256.hash(username).slice(0, 22))
 
     ctx.status = 204
