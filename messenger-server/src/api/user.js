@@ -32,7 +32,7 @@ router.post('/', async ctx => {
 
     let publicKey = pair.publicKey
 
-    let key = sha256.hash(password).slice(0, 32)
+    let key = sha256.hash(secret).slice(0, 32)
     let iv = sha256.hash(username).slice(0, 16)
     let privateKey = aes.encrypt(pair.privateKey, key, iv)
 
