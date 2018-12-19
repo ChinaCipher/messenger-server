@@ -75,9 +75,7 @@ class User {
     }
 
     static async create(user) {
-        await users(user).save(err => {
-            if (err) throw new Error(err)
-        })
+        await users(user).save()
     }
 }
 
