@@ -164,7 +164,7 @@ router.patch('/:username/password', async ctx => {
         return
     }
 
-    let oldPassword = await bcrypt.hash(oldPassword, '$2b$10$' + sha256.hash(username).slice(0, 22))
+    oldPassword = await bcrypt.hash(oldPassword, '$2b$10$' + sha256.hash(username).slice(0, 22))
     if (oldPassword != user.password) {
         ctx.body = {
             message: "old password is wrong."
