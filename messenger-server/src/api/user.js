@@ -168,7 +168,7 @@ router.patch('/:username/password', async ctx => {
         ctx.body = {
             message: "permission denied."
         }
-        ctx.status = 401
+        ctx.status = 403
         return
     }
 
