@@ -133,4 +133,49 @@ router.patch('/:username', async ctx => {
     }
 })
 
+router.patch('/:username/password', async ctx => {
+    let username = ctx.params.username
+    let oldPassword = ctx.request.body.oldPassword
+    let newPassword = ctx.request.body.newPassword
+
+    let user = await User.find(username)
+
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    if (!ctx.session.login) {
+        ctx.body = {
+            message: "not logged in."
+        }
+        ctx.status = 401
+        return
+    }
+
+    if (username != ctx.session.username) {
+        ctx.body = {
+            message: "permission denied."
+        }
+        ctx.status = 403
+        return
+    }
+
+    let oldPassword = await bcrypt.hash(oldPassword, '$2b$10$' + sha256.hash(username).slice(0, 22))
+    if (oldPassword != user.password) {
+        ctx.body = {
+            message: "old password is wrong."
+        }
+        ctx.status = 401
+        return
+    }
+
+    user.password = await bcrypt.hash(newPassword, '$2b$10$' + sha256.hash(username).slice(0, 22))
+
+    ctx.status = 204
+})
+
 module.exports = router
