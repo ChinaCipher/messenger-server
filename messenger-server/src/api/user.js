@@ -29,9 +29,9 @@ router.post('/', async ctx => {
     let avatar = "https://herher.ntut.com.tw/img/dolphin.png"
 
     let pair = ec.generateKeyPair()
-    
+
     let publicKey = pair.publicKey
-    
+
     let key = sha256.hash(password).slice(0, 32)
     let iv = sha256.hash(username).slice(0, 16)
     let privateKey = aes.encrypt(pair.privateKey, key, iv)
@@ -83,6 +83,52 @@ router.get('/:username', async ctx => {
             nickname: user.nickname
         },
         publicKey: user.publicKey
+    }
+})
+
+router.patch('/:username', async ctx => {
+    let username = ctx.params.username
+    let nickname = ctx.request.body.nickname
+    let avatar = ctx.request.body.avatar
+
+    let user = await User.find(username)
+
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    if (!ctx.session.login) {
+        ctx.body = {
+            message: "not logged in."
+        }
+        ctx.status = 401
+        return
+    }
+
+    if (username != ctx.session.username) {
+        ctx.body = {
+            message: "permission denied."
+        }
+        ctx.status = 403
+        return
+    }
+
+    if (nickname) {
+        user.nickname = nickname
+    }
+
+    if (avatar) {
+        user.avatar = avatar
+    }
+
+    ctx.body = {
+        avatar: user.avatar,
+        username: user.username,
+        nickname: user.nickname
     }
 })
 
