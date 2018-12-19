@@ -1,8 +1,8 @@
-const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 const Router = require('koa-router')
 
 const User = require('../db/user')
+const sha256 = require('../util/sha256')
 
 const router = new Router()
 
@@ -20,7 +20,7 @@ router.post('/', async ctx => {
         return
     }
 
-    let salt = '$2b$10$' + crypto.createHash('sha256').update(username).digest('hex').slice(0, 22)
+    let salt = '$2b$10$' + sha256.hash(username).slice(0, 22)
     let password = await bcrypt.hash(secret, salt)
 
     let publicKey = 'wow'
