@@ -18,7 +18,7 @@ router.post('/', async ctx => {
         ctx.body = {
             message: "username was already taken."
         }
-        ctx.status = 403
+        ctx.status = 401
         return
     }
 
@@ -50,7 +50,7 @@ router.post('/', async ctx => {
         ctx.body = {
             message: "database validation error occurred."
         }
-        ctx.status = 403
+        ctx.status = 401
         return
     }
 
@@ -160,7 +160,7 @@ router.patch('/:username/password', async ctx => {
         ctx.body = {
             message: "permission denied."
         }
-        ctx.status = 403
+        ctx.status = 401
         return
     }
 
