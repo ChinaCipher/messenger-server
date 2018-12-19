@@ -26,7 +26,7 @@ router.post('/', async ctx => {
     let hashsalt = ctx.session.code
     
     let user = await User.find(username)
-    if (!user.username) {
+    if (!user) {
         ctx.body = {
             message: "username does not exist."
         }
