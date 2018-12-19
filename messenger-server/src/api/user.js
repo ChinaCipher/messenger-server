@@ -191,6 +191,13 @@ router.patch('/:username/password', async ctx => {
 
     user.password = await bcrypt.hash(newPassword, '$2b$10$' + sha256.hash(username).slice(0, 22))
 
+    let key = sha256.hash(oldPassword).slice(0, 32)
+    let iv = sha256.hash(username).slice(0, 16)
+    let originalPrivateKey = aes.decrypt(user.privateKey, key, iv)
+
+    key = sha256.hash(newPassword).slice(0, 32)
+    user.privateKey = aes.encrypt(originalPrivateKey, key, iv)
+
     ctx.status = 204
 })
 
