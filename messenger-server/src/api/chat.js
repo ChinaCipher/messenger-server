@@ -106,4 +106,32 @@ router.get('/:username', async ctx => {
     }
 })
 
+router.get('/:username/message', async ctx => {
+    const username = ctx.params.username
+
+    if (!ctx.session.login) {
+        ctx.body = {
+            message: "not logged in."
+        }
+        ctx.status = 401
+        return
+    }
+
+    // temp
+    if (!temprooms[username]) {
+        ctx.body = {
+            message: "chatroom does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    // temp
+    let messages = temprooms[username].messages
+
+    ctx.body = {
+        messages
+    }
+})
+
 module.exports = router 
