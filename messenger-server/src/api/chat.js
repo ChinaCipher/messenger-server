@@ -128,15 +128,15 @@ router.get('/:username/message', async ctx => {
         return
     }
 
+    // temp
+    let messages = temprooms[username].messages
 
-    if (index == undefined) {
-        index = Number.MAX_VALUE
-    }
-
+    // temp
+    index = index || messages.length - 1
     count = count || 1
 
     // temp
-    let messages = temprooms[username].messages.slice(Math.max(0, index - count + 1), index + 1)
+    messages = messages.slice(Math.max(0, index - count + 1), index + 1)
 
     ctx.body = {
         messages
