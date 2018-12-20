@@ -4,14 +4,15 @@ let Schema = mongoose.Schema
 
 let user = new Schema({
     "username": { type: String, index: true, minlength: 8, maxlength: 30 },
-    "messagekey": { type: String, index: true }
+    "messageKey": { type: String, index: true }
 })
 
 let message = new Schema({
-    "id": { type: Number, index: { unique: true, dropDups: true }, default: 0 },
+    "id": { type: Number, index: true, default: 0 },
     "sender": { type: String, index: true },
     "type": { type: String, index: true },
-    "content": { type: String, index: true }
+    "content": { type: String, index: true },
+    "options": { type: Object, index: true, default: {} }
 })
 
 let chatroom = new Schema({
@@ -20,11 +21,11 @@ let chatroom = new Schema({
     "userB": { type: user, index: { unique: true, dropDups: true } }
 })
 
-chatroom.statics.findByUsersname = function (users) {
+chatroom.statics.findByUsersname = function (users, fields) {
     return this.findOne({
         "userA.username": users.userA.username,
         "userB.username": users.userB.username
-    })
+    }, fields)
 }
 
 const model = mongoose.model('chatroom', chatroom)
