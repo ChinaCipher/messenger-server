@@ -102,7 +102,7 @@ router.get('/:username', async ctx => {
     }
 
     ctx.body = {
-        messages: temprooms[username].messages
+        messageKey: temprooms[username].userA.messageKey
     }
 })
 
