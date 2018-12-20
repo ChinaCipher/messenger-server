@@ -65,11 +65,11 @@ router.post('/', async ctx => {
     let temproom = {
         userA: {
             username: [userA.username],
-            messageKey: await ecies.encrypt(userA.publicKey, originalMessageKey)
+            messageKey: JSON.stringify(await ecies.encrypt(userA.publicKey, originalMessageKey))
         },
         userB: {
             username: [userB.username],
-            messageKey: await ecies.encrypt(userB.publicKey, originalMessageKey)
+            messageKey: JSON.stringify(await ecies.encrypt(userB.publicKey, originalMessageKey))
         },
         messages: []
     }
