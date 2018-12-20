@@ -184,4 +184,40 @@ router.post('/:username/message', async ctx => {
     }
 })
 
+router.get('/:username/message/:messageId', async ctx => {
+    const username = ctx.params.username
+    const messageId = ctx.params.messageId
+
+    if (!ctx.session.login) {
+        ctx.body = {
+            message: "not logged in."
+        }
+        ctx.status = 401
+        return
+    }
+
+    // temp
+    if (!temprooms[username]) {
+        ctx.body = {
+            message: "chatroom does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    // temp
+    if (messageId > temprooms[username].messages.length) {
+        ctx.body = {
+            message: "message does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    // temp
+    let message = temprooms[username].messages[messageId - 1]
+
+    ctx.body = message
+})
+
 module.exports = router 
