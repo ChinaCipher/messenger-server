@@ -9,10 +9,14 @@ class Chatroom {
 
     static async find(users, fields) {
         if (fields) {
-            return await message.findByUsersname(users, fields)
+            let chatdata = await message.findByUsersname(users, fields)
+            if (chatdata === null)return null
+            return chatdata
         }
         else {
             let chatdata = await message.findByUsersname(users)
+            if (chatdata === null)return null
+            return chatdata
             return new Chatroom(chatdata)
         }
     }
