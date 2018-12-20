@@ -10,8 +10,8 @@ const router = new Router()
 
 
 router.post('/', async ctx => {
-    let username = ctx.request.body.username
-    let secret = ctx.request.body.secret
+    const username = ctx.request.body.username
+    const secret = ctx.request.body.secret
 
     let user = await User.find(username)
     if (user) {
@@ -30,29 +30,21 @@ router.post('/', async ctx => {
         return
     }
 
-    let password = await bcrypt.hash(secret, '$2b$10$' + sha256.hash(username).slice(0, 22))
-
-    let nickname = username
-
-    let avatar = "https://ccm.ntut.com.tw/img/default_avatar.png"
-
     let pair = ecies.generateKeyPair()
-
-    let publicKey = pair.publicKey
-
     let key = sha256.hash(secret).slice(0, 32)
     let iv = sha256.hash(username).slice(0, 16)
-    let privateKey = aes.encrypt(pair.privateKey, key, iv)
+
+    let profile = {
+        username,
+        password: await bcrypt.hash(secret, '$2b$10$' + sha256.hash(username).slice(0, 22)),
+        nickname: username,
+        avatar: "https://ccm.ntut.com.tw/img/default_avatar.png",
+        publicKey: pair.publicKey,
+        privateKey: aes.encrypt(pair.privateKey, key, iv)
+    }
 
     try {
-        await User.create({
-            username,
-            password,
-            nickname,
-            avatar,
-            publicKey,
-            privateKey,
-        })
+        await User.create(profile)
     }
     catch (e) {
         ctx.body = {
@@ -73,10 +65,9 @@ router.post('/', async ctx => {
 })
 
 router.get('/:username', async ctx => {
-    let username = ctx.params.username
+    const username = ctx.params.username
 
     let user = await User.find(username)
-
     if (!user) {
         ctx.body = {
             message: "username does not exist."
@@ -96,12 +87,11 @@ router.get('/:username', async ctx => {
 })
 
 router.patch('/:username', async ctx => {
-    let username = ctx.params.username
-    let nickname = ctx.request.body.nickname
-    let avatar = ctx.request.body.avatar
+    const username = ctx.params.username
+    const nickname = ctx.request.body.nickname
+    const avatar = ctx.request.body.avatar
 
     let user = await User.find(username)
-
     if (!user) {
         ctx.body = {
             message: "username does not exist."
@@ -142,12 +132,11 @@ router.patch('/:username', async ctx => {
 })
 
 router.patch('/:username/password', async ctx => {
-    let username = ctx.params.username
-    let oldSecret = ctx.request.body.oldSecret
-    let newSecret = ctx.request.body.newSecret
+    const username = ctx.params.username
+    const oldSecret = ctx.request.body.oldSecret
+    const newSecret = ctx.request.body.newSecret
 
     let user = await User.find(username)
-
     if (!user) {
         ctx.body = {
             message: "username does not exist."
@@ -191,12 +180,11 @@ router.patch('/:username/password', async ctx => {
 
     user.password = await bcrypt.hash(newSecret, '$2b$10$' + sha256.hash(username).slice(0, 22))
 
-    let key = sha256.hash(oldSecret).slice(0, 32)
+    let oldKey = sha256.hash(oldSecret).slice(0, 32)
+    let newKey = sha256.hash(newSecret).slice(0, 32)
     let iv = sha256.hash(username).slice(0, 16)
-    let originalPrivateKey = aes.decrypt(user.privateKey, key, iv)
 
-    key = sha256.hash(newSecret).slice(0, 32)
-    user.privateKey = aes.encrypt(originalPrivateKey, key, iv)
+    user.privateKey = aes.encrypt(aes.decrypt(user.privateKey, oldKey, iv), newKey, iv)
 
     ctx.status = 204
 })

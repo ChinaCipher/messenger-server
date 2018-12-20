@@ -12,8 +12,8 @@ router.get('/', async ctx => {
 })
 
 router.post('/', async ctx => {
-    let username = ctx.request.body.username
-    let password = ctx.request.body.password
+    const username = ctx.request.body.username
+    const password = ctx.request.body.password
 
     if (!ctx.session.code) {
         ctx.body = {
@@ -23,8 +23,6 @@ router.post('/', async ctx => {
         return
     }
 
-    let hashsalt = ctx.session.code
-    
     let user = await User.find(username)
     if (!user) {
         ctx.body = {
@@ -34,8 +32,8 @@ router.post('/', async ctx => {
         return
     }
 
-    password = `${hashsalt}${password.slice(29, 60)}`
-    if (!await bcrypt.compare(user.password, password)) {
+    let result = `${ctx.session.code}${password.slice(29, 60)}`
+    if (!await bcrypt.compare(user.password, result)) {
         ctx.body = {
             message: "wrong password."
         }
@@ -44,9 +42,9 @@ router.post('/', async ctx => {
     }
 
     ctx.session.code = undefined
-
     ctx.session.username = username
     ctx.session.login = true
+
     ctx.body = {
         user: {
             avatar: user.avatar,
@@ -71,6 +69,7 @@ router.delete('/', async ctx => {
 
     ctx.session.username = undefined
     ctx.session.login = false
+
     ctx.status = 204
 })
 
