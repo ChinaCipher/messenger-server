@@ -7,5 +7,10 @@ module.exports = {
     session: {
         key: "koa:sess",
         maxAge: 86400000
+    },
+    database: {
+        host: "localhost:27017",
+        user: "XI",
+        pswd: "ChinaNumberOne"
     }
 }
