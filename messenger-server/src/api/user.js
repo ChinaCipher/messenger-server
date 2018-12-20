@@ -91,15 +91,6 @@ router.patch('/:username', async ctx => {
     const nickname = ctx.request.body.nickname
     const avatar = ctx.request.body.avatar
 
-    let user = await User.find(username)
-    if (!user) {
-        ctx.body = {
-            message: "username does not exist."
-        }
-        ctx.status = 404
-        return
-    }
-
     if (!ctx.session.login) {
         ctx.body = {
             message: "not logged in."
@@ -136,15 +127,6 @@ router.patch('/:username/password', async ctx => {
     const oldSecret = ctx.request.body.oldSecret
     const newSecret = ctx.request.body.newSecret
 
-    let user = await User.find(username)
-    if (!user) {
-        ctx.body = {
-            message: "username does not exist."
-        }
-        ctx.status = 404
-        return
-    }
-
     if (!ctx.session.login) {
         ctx.body = {
             message: "not logged in."
@@ -161,18 +143,18 @@ router.patch('/:username/password', async ctx => {
         return
     }
 
-    let oldPassword = await bcrypt.hash(oldSecret, '$2b$10$' + sha256.hash(username).slice(0, 22))
-    if (oldPassword != user.password) {
+    if (!newSecret || (newSecret.length < 8) || (newSecret.length > 30)) {
         ctx.body = {
-            message: "old password is wrong."
+            message: "password must be longer than 3 and shorter than 30."
         }
         ctx.status = 401
         return
     }
 
-    if (!newSecret || (newSecret.length < 8) || (newSecret.length > 30)) {
+    let oldPassword = await bcrypt.hash(oldSecret, '$2b$10$' + sha256.hash(username).slice(0, 22))
+    if (oldPassword != user.password) {
         ctx.body = {
-            message: "password must be longer than 3 and shorter than 30."
+            message: "wrong password."
         }
         ctx.status = 401
         return
