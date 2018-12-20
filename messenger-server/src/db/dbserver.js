@@ -2,9 +2,8 @@ const mongoose = require('mongoose')
 const config = require('../config')
 
 function connect() {
-    const connString = 'mongodb://' + config.db.user + ':' +
-        config.db.pwd + '@localhost:27017/' +
-        config.db.db + '?authSource=admin'
+    const userString = `${config.database.user}:${config.database.pswd}`
+    const connString = `mongodb://${userString}@${config.database.host}/CCM?authSource=admin`
     mongoose.connect(connString, { useNewUrlParser: true, autoIndex: false })
 
     // MongoDB 連接成功後回調，這裡僅輸出一行日誌

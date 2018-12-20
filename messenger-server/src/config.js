@@ -8,9 +8,9 @@ module.exports = {
         key: "koa:sess",
         maxAge: 86400000
     },
-    db: {
-        user: "CCMadmin",
-        pwd: "test123",
-        db: "CCM"
+    database: {
+        host: "localhost:27017",
+        user: "XI",
+        pswd: "ChinaNumberOne"
     }
 }
