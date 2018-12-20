@@ -11,6 +11,7 @@
     "eccrypto": "^1.1.0",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
+    "koa-cors": "^0.0.16",
     "koa-logger": "^3.2.0",
     "koa-router": "^7.4.0",
     "koa-session": "^5.10.1",
@@ -26,7 +27,7 @@
     "nodemon": "^1.18.8"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node messenger-server/src/index.js",
+    "dev": "nodemon --exec babel-node messenger-server/src/index.js --allow-cors",
     "build": "babel messenger-server/src --out-dir messenger-server/dist",
     "serve": "node messenger-server/dist"
   }

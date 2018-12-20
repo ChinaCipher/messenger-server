@@ -1,6 +1,7 @@
 require('@babel/polyfill')
 const Koa = require('koa')
 const Router = require('koa-router')
+const cors = require('koa-cors')
 const logger = require('koa-logger')
 const statics = require('koa-static')
 const session = require('koa-session')
@@ -14,6 +15,17 @@ const app = new Koa()
 const router = new Router()
 
 app.keys = config.app.keys || ['some secret hurr']
+
+let args = process.argv.slice(2)
+if (args[0] == '--allow-cors') {
+    app.use(cors({
+        origin: "http://localhost:8080",
+        credentials: true
+    }))
+
+    console.log("Set header - Access-Control-Allow-Origin: http://localhost:8080")
+    console.log("Set header - Access-Control-Allow-Credentials: true")
+}
 
 app.use(logger())
 app.use(bodyparser())
