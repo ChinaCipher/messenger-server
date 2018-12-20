@@ -8,7 +8,28 @@ const router = new Router()
 
 router.get('/', async ctx => {
     ctx.session.code = await bcrypt.genSalt(10)
-    ctx.body = { code: ctx.session.code }
+
+    if (!ctx.session.login) {
+        ctx.body = {
+            code: ctx.session.code,
+            profile: null
+        }
+        return
+    }
+
+    let user = await User.find(ctx.session.username)
+
+    ctx.body = {
+        code: ctx.session.code,
+        profile: {
+            user: {
+                avatar: user.avatar,
+                username: user.username,
+                nickname: user.nickname
+            },
+            privateKey: user.privateKey
+        }
+    }
 })
 
 router.post('/', async ctx => {
