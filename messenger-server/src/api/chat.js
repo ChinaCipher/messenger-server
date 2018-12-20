@@ -136,7 +136,7 @@ router.get('/:username/message', async ctx => {
     count = count || 1
 
     // temp
-    messages = messages.slice(Math.max(0, index - count + 1), index + 1)
+    messages = messages.slice(Math.max(0, index - count), index)
 
     ctx.body = {
         messages
