@@ -48,7 +48,7 @@ router.post('/', async ctx => {
     }
 
     // temp
-    if (rooms.username) {
+    if (temprooms[username]) {
         ctx.body = {
             message: "chatroom already exists."
         }
