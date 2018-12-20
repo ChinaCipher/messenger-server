@@ -2,8 +2,8 @@ const bcrypt = require('bcryptjs')
 const Router = require('koa-router')
 
 const User = require('../db/user')
-const ec = require('../util/ec')
 const aes = require('../util/aes')
+const ecies = require('../util/ecies')
 const sha256 = require('../util/sha256')
 
 const router = new Router()
@@ -36,7 +36,7 @@ router.post('/', async ctx => {
 
     let avatar = "https://herher.ntut.com.tw/img/dolphin.png"
 
-    let pair = ec.generateKeyPair()
+    let pair = ecies.generateKeyPair()
 
     let publicKey = pair.publicKey
 
