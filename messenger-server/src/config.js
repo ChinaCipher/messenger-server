@@ -1,8 +1,8 @@
 module.exports = {
     app: {
         version: "v1.0.0",
-        port: 3000,
-        keys: ["wasaywasay"]
+        port: 8787,
+        keys: ["some secret hurr"]
     },
     session: {
         key: "koa:sess",

@@ -13,14 +13,14 @@ const config = require('./config')
 const app = new Koa()
 const router = new Router()
 
-app.keys = config.app.keys
+app.keys = config.app.keys || ['some secret hurr']
 
 app.use(logger())
 app.use(bodyparser())
 app.use(statics(__dirname + '/../public'))
 app.use(session({
-    key: config.session.key,
-    maxAge: config.session.maxAge,
+    key: config.session.key || 'koa:sess',
+    maxAge: config.session.maxAge || 86400000,
     autoCommit: true,
     overwrite: true,
     httpOnly: true,
@@ -34,6 +34,6 @@ dbserver.connect()
 router.use('/api', api.router.routes(), api.router.allowedMethods())
 app.use(router.routes()).use(router.allowedMethods())
 
-app.listen(config.app.port, () => {
-    console.log(`Server is running at port ${config.app.port}.`)
+app.listen(config.app.port || 8787, () => {
+    console.log(`Server is running at port ${config.app.port || 8787}.`)
 })
