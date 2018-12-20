@@ -34,7 +34,7 @@ router.post('/', async ctx => {
 
     let nickname = username
 
-    let avatar = "https://herher.ntut.com.tw/img/dolphin.png"
+    let avatar = "https://ccm.ntut.com.tw/img/default_avatar.png"
 
     let pair = ecies.generateKeyPair()
 
