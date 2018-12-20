@@ -108,6 +108,8 @@ router.get('/:username', async ctx => {
 
 router.get('/:username/message', async ctx => {
     const username = ctx.params.username
+    let index = ctx.query.index
+    let count = ctx.query.count
 
     if (!ctx.session.login) {
         ctx.body = {
@@ -126,8 +128,15 @@ router.get('/:username/message', async ctx => {
         return
     }
 
+
+    if (index == undefined) {
+        index = Number.MAX_VALUE
+    }
+
+    count = count || 1
+
     // temp
-    let messages = temprooms[username].messages
+    let messages = temprooms[username].messages.slice(Math.max(0, index - count + 1), index + 1)
 
     ctx.body = {
         messages
