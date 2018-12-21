@@ -7,7 +7,7 @@ const statics = require('koa-static')
 const session = require('koa-session')
 const bodyparser = require('koa-bodyparser')
 
-const dbserver = require('./db/dbserver')
+const db = require('./db/server')
 const api = require('./route')
 const config = require('./config')
 
@@ -41,7 +41,7 @@ app.use(session({
     renew: false,
 }, app))
 
-dbserver.connect()
+db.connect()
 
 router.use('/api', api.router.routes(), api.router.allowedMethods())
 app.use(router.routes()).use(router.allowedMethods())
