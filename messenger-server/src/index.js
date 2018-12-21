@@ -7,12 +7,15 @@ const statics = require('koa-static')
 const session = require('koa-session')
 const bodyparser = require('koa-bodyparser')
 
+const config = require('./config')
 const db = require('./db/server')
 const api = require('./route')
-const config = require('./config')
+
 
 const app = new Koa()
 const router = new Router()
+
+db.connect()
 
 app.keys = config.app.keys || ['some secret hurr']
 
@@ -41,11 +44,9 @@ app.use(session({
     renew: false,
 }, app))
 
-db.connect()
-
 router.use('/api', api.router.routes(), api.router.allowedMethods())
 app.use(router.routes()).use(router.allowedMethods())
 
 app.listen(config.app.port || 8787, () => {
-    console.log(`Server is running at port ${config.app.port || 8787}.`)
+    console.log(`Server is running on http://localhost:${config.app.port || 8787}.`)
 })
