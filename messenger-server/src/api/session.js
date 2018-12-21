@@ -44,6 +44,9 @@ router.post('/', async ctx => {
         return
     }
 
+    let salt = ctx.session.code
+    ctx.session.code = undefined
+
     let user = await User.find(username)
     if (!user) {
         ctx.body = {
@@ -53,7 +56,7 @@ router.post('/', async ctx => {
         return
     }
 
-    let result = `${ctx.session.code}${password.slice(29, 60)}`
+    let result = `${salt}${password.slice(29, 60)}`
     if (!await bcrypt.compare(user.password, result)) {
         ctx.body = {
             message: "wrong password."
@@ -62,7 +65,6 @@ router.post('/', async ctx => {
         return
     }
 
-    ctx.session.code = undefined
     ctx.session.username = username
     ctx.session.login = true
 
