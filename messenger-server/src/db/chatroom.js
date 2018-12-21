@@ -47,13 +47,13 @@ class Chatroom {
             "userA": this._userA,
             "userB": this._userB
         })
-        if (msgdata["id"] === undefined) msgdata["id"] = chatdata.messages[chatdata.messages.length - 1].id + 1
+        // if (msgdata["id"] === undefined) msgdata["id"] = chatdata.messages[chatdata.messages.length - 1].id + 1
         await chatdata.update({ "$push": { messages: msgdata } })
         let newchatdata = await message.findByUsersname({
             "userA": this._userA,
             "userB": this._userB
         })
-        this._messages = newchatdata.messages
+        this._messages.push(new msg(newchatdata.messages, this._userA.username, this._userB.username))
     }
 
 
