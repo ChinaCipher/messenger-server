@@ -1,4 +1,4 @@
-const message = require('./models/chatroom')
+const message = require('./models/chatrooms')
 
 class Chatroom {
     constructor(chatdata) {
@@ -26,12 +26,12 @@ class Chatroom {
             }, fields)
         }
 
-        let chatroomList = []
+        let result = []
         chatrooms.forEach((chatroom) => {
-            chatroomList.push(new Chatroom(chatroom))
+            result.push(new Chatroom(chatroom))
         })
 
-        return chatroomList
+        return result
     }
 
     static async create(chatdata) {
