@@ -37,6 +37,13 @@ class Chatroom {
         })
         this._messages = newchatdata.messages
     }
+
+    static async findChatroomsByOneUser(username) {
+        let chatRooms = await message.find({
+            "$or": [{ "userA.username": username }, { "userB.username": username }]
+        })
+        return chatRooms
+    }
 }
 
 module.exports = Chatroom
