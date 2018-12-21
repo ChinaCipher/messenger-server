@@ -20,7 +20,16 @@ router.get('/', async ctx => {
     }
 
     // temp
-    let rooms = Object.values(temprooms)
+    let rooms = []
+    for (const username in temprooms) {
+        let user = await User.find(temprooms[username].userB.username)
+        let room = {
+            avatar: user.avatar,
+            username: user.username,
+            nickname: user.nickname
+        }
+        rooms.push(room)
+    }
 
     ctx.body = {
         rooms
@@ -64,11 +73,11 @@ router.post('/', async ctx => {
     // temp
     let temproom = {
         userA: {
-            username: [userA.username],
+            username: userA.username,
             messageKey: JSON.stringify(await ecies.encrypt(userA.publicKey, originalMessageKey))
         },
         userB: {
-            username: [userB.username],
+            username: userB.username,
             messageKey: JSON.stringify(await ecies.encrypt(userB.publicKey, originalMessageKey))
         },
         messages: []
