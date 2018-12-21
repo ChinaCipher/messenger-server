@@ -1,10 +1,14 @@
 const message = require('./models/chatrooms')
+const msg = require('./message')
 
 class Chatroom {
     constructor(chatdata) {
-        this._messages = chatdata.messages
         this._userA = chatdata.userA
         this._userB = chatdata.userB
+        this._messages = []
+        chatdata.messages.forEach((message) => {
+            this._messages.push(new msg(message, this._userA.username, this._userB.username))
+        })
     }
 
     /**
