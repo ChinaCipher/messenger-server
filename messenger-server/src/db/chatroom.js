@@ -22,8 +22,6 @@ class Chatroom {
 
     static async create(chatdata) {
         await message(chatdata).save()
-        let a = await message.findByUsersname({ userA: chatdata.userA, userB: chatdata.userB })
-        return new Chatroom(a)
     }
 
     async update(msgdata) {
