@@ -2,9 +2,9 @@ const message = require('./models/messages')
 
 class Chatroom {
     constructor(chatdata) {
-        this.messages = chatdata.messages
-        this.userA = chatdata.userA
-        this.userB = chatdata.userB
+        this._messages = chatdata.messages
+        this._userA = chatdata.userA
+        this._userB = chatdata.userB
     }
 
     static async find(users, fields) {
@@ -28,16 +28,16 @@ class Chatroom {
 
     async update(msgdata) {
         let chatdata = await message.findByUsersname({
-            "userA": this.userA,
-            "userB": this.userB
+            "userA": this._userA,
+            "userB": this._userB
         })
         if (msgdata["id"] === undefined) msgdata["id"] = chatdata.messages[chatdata.messages.length - 1].id + 1
         await chatdata.update({ "$push": { messages: msgdata } })
         let newchatdata = await message.findByUsersname({
-            "userA": this.userA,
-            "userB": this.userB
+            "userA": this._userA,
+            "userB": this._userB
         })
-        this.messages = newchatdata.messages
+        this._messages = newchatdata.messages
     }
 }
 
