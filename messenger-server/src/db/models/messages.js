@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-let Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
 let user = new Schema({
     "username": { type: String, index: true, minlength: 8, maxlength: 30 },
