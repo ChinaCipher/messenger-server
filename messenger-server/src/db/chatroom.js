@@ -26,8 +26,6 @@ class Chatroom {
             }, fields)
         }
 
-        if (chatrooms.length === 0) return null
-
         let chatroomList = []
         chatrooms.forEach((chatroom) => {
             chatroomList.push(new Chatroom(chatroom))
