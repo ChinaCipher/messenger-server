@@ -1,4 +1,4 @@
-const message = require('./models/messages')
+const message = require('./models/chatroom')
 
 class Chatroom {
     constructor(chatdata) {
@@ -7,17 +7,33 @@ class Chatroom {
         this._userB = chatdata.userB
     }
 
-    static async find(users, fields) {
-        if (fields) {
-            let chatdata = await message.findByUsersname(users, fields)
-            if (chatdata === null) return null
-            return new Chatroom(chatdata)
+    /**
+     * 
+     * @param {String} usernameA 
+     * @param {String} usernameB 
+     * @param {String} fields 
+     */
+    static async find(usernameA, usernameB, fields) {
+        let chatrooms = null
+        if (usernameB === null) {
+            chatrooms = await message.find({
+                "$or": [{ "userA.username": usernameA }, { "userB.username": usernameA }]
+            }, fields)
         }
         else {
-            let chatdata = await message.findByUsersname(users)
-            if (chatdata === null) return null
-            return new Chatroom(chatdata)
+            chatrooms = await message.find({
+                "$and": [{ "userA.username": usernameA }, { "userB.username": usernameB }]
+            }, fields)
         }
+
+        if (chatrooms.length === 0) return null
+
+        let chatroomList = []
+        chatrooms.forEach((chatroom) => {
+            chatroomList.push(new Chatroom(chatroom))
+        })
+
+        return chatroomList
     }
 
     static async create(chatdata) {
@@ -36,13 +52,6 @@ class Chatroom {
             "userB": this._userB
         })
         this._messages = newchatdata.messages
-    }
-
-    static async findChatroomsByOneUser(username) {
-        let chatRooms = await message.find({
-            "$or": [{ "userA.username": username }, { "userB.username": username }]
-        })
-        return chatRooms
     }
 }
 
