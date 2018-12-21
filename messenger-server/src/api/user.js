@@ -77,12 +77,9 @@ router.get('/:username', async ctx => {
     }
 
     ctx.body = {
-        user: {
-            avatar: user.avatar,
-            username: user.username,
-            nickname: user.nickname
-        },
-        publicKey: user.publicKey
+        avatar: user.avatar,
+        username: user.username,
+        nickname: user.nickname
     }
 })
 
