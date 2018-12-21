@@ -10,20 +10,19 @@ class Chatroom {
     static async find(users, fields) {
         if (fields) {
             let chatdata = await message.findByUsersname(users, fields)
-            if (chatdata === null)return null
-            return chatdata
+            if (chatdata === null) return null
+            return new Chatroom(chatdata)
         }
         else {
             let chatdata = await message.findByUsersname(users)
-            if (chatdata === null)return null
-            return chatdata
+            if (chatdata === null) return null
             return new Chatroom(chatdata)
         }
     }
 
     static async create(chatdata) {
         await message(chatdata).save()
-        let a = await Chatroom.find({ userA: chatdata.userA, userB: chatdata.userB })
+        let a = await message.findByUsersname({ userA: chatdata.userA, userB: chatdata.userB })
         return new Chatroom(a)
     }
 
@@ -32,7 +31,7 @@ class Chatroom {
             "userA": this.userA,
             "userB": this.userB
         })
-        if (msgdata["id"] === undefined)msgdata["id"] = chatdata.messages[chatdata.messages.length - 1].id + 1
+        if (msgdata["id"] === undefined) msgdata["id"] = chatdata.messages[chatdata.messages.length - 1].id + 1
         await chatdata.update({ "$push": { messages: msgdata } })
         let newchatdata = await message.findByUsersname({
             "userA": this.userA,
