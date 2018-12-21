@@ -51,6 +51,32 @@ class Chatroom {
         })
         this._messages = newchatdata.messages
     }
+
+
+    set userA(value) {
+        this._userA = value
+    }
+
+    set usernameB(value) {
+        this._userB = value
+    }
+
+    set messages(value) {
+        this._messages = value
+    }
+
+
+    get userA() {
+        return this._userA
+    }
+
+    get usernameB() {
+        return this._userB
+    }
+
+    get messages() {
+        return this._messages
+    }
 }
 
 module.exports = Chatroom
