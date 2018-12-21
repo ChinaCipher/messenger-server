@@ -8,7 +8,7 @@ let user = new Schema({
 })
 
 let message = new Schema({
-    "id": { type: Number, index: true, default: 0 },
+    "id": { type: Number, index: true, default: 1 },
     "sender": { type: String, index: true },
     "type": { type: String, index: true },
     "content": { type: String, index: true },
