@@ -43,7 +43,7 @@ class Chatroom {
     }
 
     static async create(chatdata) {
-        await message(chatdata).save()
+        await chatrooms(chatdata).save()
     }
 
     async postMessage(msgdata) {
@@ -72,7 +72,6 @@ class Chatroom {
     set messages(value) {
         this._messages = value
     }
-
 
     get userA() {
         return this._userA
