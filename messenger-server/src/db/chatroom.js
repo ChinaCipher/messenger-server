@@ -18,14 +18,14 @@ class Chatroom {
      * @param {String} fields 
      */
     static async find(usernameA, usernameB, fields) {
-        let chatrooms = null
+        let chatroomList = null
         if (usernameB === null) {
-            chatrooms = await chatrooms.find({
+            chatroomList = await chatrooms.find({
                 "$or": [{ "userA.username": usernameA }, { "userB.username": usernameA }]
             }, fields)
         }
         else {
-            chatrooms = await chatrooms.find({
+            chatroomList = await chatrooms.find({
                 "$or": [{
                     "$and": [{ "userA.username": usernameA }, { "userB.username": usernameB }]
                 }, {
@@ -35,7 +35,7 @@ class Chatroom {
         }
 
         let result = []
-        chatrooms.forEach((chatroom) => {
+        chatroomList.forEach((chatroom) => {
             result.push(new Chatroom(chatroom))
         })
 
