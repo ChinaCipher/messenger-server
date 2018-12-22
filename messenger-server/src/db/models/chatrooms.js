@@ -9,6 +9,7 @@ let user = new Schema({
 
 let message = new Schema({
     "id": { type: Number, index: true, default: 1 },
+    "timestamp": { type: Date, default: Date.now },
     "sender": { type: String, index: true },
     "type": { type: String, index: true },
     "content": { type: String, index: true },
