@@ -84,6 +84,7 @@ router.post('/', async ctx => {
             username: userB.username,
             messageKey: JSON.stringify(await ecies.encrypt(userB.publicKey, originalMessageKey))
         },
+        visibility: false,
         messages: []
     }
 
