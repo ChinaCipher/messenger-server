@@ -7,7 +7,7 @@ const router = new Router()
 
 router.get('/', async ctx => {
     ctx.body = {
-        version: config.app.version,
+        version: "v1.0.0",
         message: "Hello, China!"
     }
 })
