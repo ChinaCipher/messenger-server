@@ -9,26 +9,30 @@ const router = new Router()
 router.get('/', async ctx => {
     ctx.session.code = await bcrypt.genSalt(10)
 
-    if (!ctx.session.login) {
-        ctx.body = {
-            code: ctx.session.code,
-            profile: null
+    if (ctx.session.login) {
+        let user = await User.find(ctx.session.username)
+
+        if (user) {
+            ctx.body = {
+                code: ctx.session.code,
+                profile: {
+                    user: {
+                        avatar: user.avatar,
+                        username: user.username,
+                        nickname: user.nickname
+                    },
+                    privateKey: user.privateKey
+                }
+            }
+            return
         }
-        return
     }
 
-    let user = await User.find(ctx.session.username)
+    ctx.session.login = false
 
     ctx.body = {
         code: ctx.session.code,
-        profile: {
-            user: {
-                avatar: user.avatar,
-                username: user.username,
-                nickname: user.nickname
-            },
-            privateKey: user.privateKey
-        }
+        profile: null
     }
 })
 
