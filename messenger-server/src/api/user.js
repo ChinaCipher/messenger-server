@@ -96,6 +96,15 @@ router.patch('/:username', async ctx => {
         return
     }
 
+    let user = await User.find(username)
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
     if (username != ctx.session.username) {
         ctx.body = {
             message: "permission denied."
@@ -129,6 +138,15 @@ router.patch('/:username/password', async ctx => {
             message: "not logged in."
         }
         ctx.status = 401
+        return
+    }
+
+    let user = await User.find(username)
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
         return
     }
 
