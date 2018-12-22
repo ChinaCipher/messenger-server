@@ -1,5 +1,5 @@
-const message = require('./models/chatrooms')
-const msg = require('./message')
+const chatrooms = require('./models/chatrooms')
+const Message = require('./message')
 
 class Chatroom {
     constructor(chatdata) {
@@ -7,7 +7,7 @@ class Chatroom {
         this._userB = chatdata.userB
         this._messages = []
         chatdata.messages.forEach((message) => {
-            this._messages.push(new msg(message, this._userA.username, this._userB.username))
+            this._messages.push(new Message(message, this._userA.username, this._userB.username))
         })
     }
 
@@ -20,13 +20,17 @@ class Chatroom {
     static async find(usernameA, usernameB, fields) {
         let chatrooms = null
         if (usernameB === null) {
-            chatrooms = await message.find({
+            chatrooms = await chatrooms.find({
                 "$or": [{ "userA.username": usernameA }, { "userB.username": usernameA }]
             }, fields)
         }
         else {
-            chatrooms = await message.find({
-                "$and": [{ "userA.username": usernameA }, { "userB.username": usernameB }]
+            chatrooms = await chatrooms.find({
+                "$or": [{
+                    "$and": [{ "userA.username": usernameA }, { "userB.username": usernameB }]
+                }, {
+                    "$and": [{ "userA.username": usernameB }, { "userB.username": usernameA }]
+                }]
             }, fields)
         }
 
@@ -42,18 +46,18 @@ class Chatroom {
         await message(chatdata).save()
     }
 
-    async update(msgdata) {
-        let chatdata = await message.findByUsersname({
+    async postMessage(msgdata) {
+        let chatdata = await chatrooms.findByUsersname({
             "userA": this._userA,
             "userB": this._userB
         })
         // if (msgdata["id"] === undefined) msgdata["id"] = chatdata.messages[chatdata.messages.length - 1].id + 1
         await chatdata.update({ "$push": { messages: msgdata } })
-        let newchatdata = await message.findByUsersname({
+        let newchatdata = await chatrooms.findByUsersname({
             "userA": this._userA,
             "userB": this._userB
         })
-        this._messages.push(new msg(newchatdata.messages, this._userA.username, this._userB.username))
+        this._messages.push(new Message(newchatdata.messages, this._userA.username, this._userB.username))
     }
 
 
@@ -61,7 +65,7 @@ class Chatroom {
         this._userA = value
     }
 
-    set usernameB(value) {
+    set userB(value) {
         this._userB = value
     }
 
@@ -74,7 +78,7 @@ class Chatroom {
         return this._userA
     }
 
-    get usernameB() {
+    get userB() {
         return this._userB
     }
 
