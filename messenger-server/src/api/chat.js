@@ -19,26 +19,33 @@ router.get('/', async ctx => {
 
     const data = await Chatroom.find(ctx.session.username, null)
 
-    let rooms = []
+    let result = []
     for (const index in data) {
-        let user = ''
-        if (data[index].userA.username == ctx.session.username) {
-            user = await User.find(data[index].userB.username)
-        }
-        else {
-            user = await User.find(data[index].userA.username)
+        let room = data[index]
+
+        if (!room.visibility) {
+            if (room.userB.username == ctx.session.username) {
+                continue
+            }
         }
 
-        let room = {
+        let user = ''
+        if (room.userA.username == ctx.session.username) {
+            user = await User.find(room.userB.username)
+        }
+        else {
+            user = await User.find(room.userA.username)
+        }
+
+        result.push({
             avatar: user.avatar,
             username: user.username,
             nickname: user.nickname
-        }
-        rooms.push(room)
+        })
     }
 
     ctx.body = {
-        rooms
+        rooms: result
     }
 })
 
@@ -66,6 +73,23 @@ router.post('/', async ctx => {
     let userB = user
     let rooms = await Chatroom.find(userA.username, userB.username)
     if (rooms.length) {
+        let room = rooms[0]
+
+        if (!room.visibility) {
+            if (room.userA.username == ctx.session.username) {
+                ctx.body = {
+                    messageKey: room.userA.messageKey
+                }
+            }
+            else {
+                ctx.body = {
+                    messageKey: room.userB.messageKey
+                }
+                room.visibility = true
+            }
+            return
+        }
+
         ctx.body = {
             message: "chatroom already exists."
         }
@@ -128,6 +152,16 @@ router.get('/:username', async ctx => {
 
     let room = rooms[0]
 
+    if (!room.visibility) {
+        if (room.userB.username == ctx.session.username) {
+            ctx.body = {
+                message: "chatroom does not exist."
+            }
+            ctx.status = 404
+            return
+        }
+    }
+
     if (room.userA.username == ctx.session.username) {
         ctx.body = {
             messageKey: room.userA.messageKey
@@ -174,6 +208,16 @@ router.get('/:username/message', async ctx => {
     }
 
     let room = rooms[0]
+
+    if (!room.visibility) {
+        if (room.userB.username == ctx.session.username) {
+            ctx.body = {
+                message: "chatroom does not exist."
+            }
+            ctx.status = 404
+            return
+        }
+    }
 
     let messages = room.messages
 
@@ -235,6 +279,16 @@ router.post('/:username/message', async ctx => {
 
     let room = rooms[0]
 
+    if (!room.visibility) {
+        if (room.userB.username == ctx.session.username) {
+            ctx.body = {
+                message: "chatroom does not exist."
+            }
+            ctx.status = 404
+            return
+        }
+    }
+
     let id = room.messages.length + 1
 
     let message = {
@@ -281,6 +335,16 @@ router.get('/:username/message/:messageId', async ctx => {
         }
         ctx.status = 404
         return
+    }
+
+    if (!room.visibility) {
+        if (room.userB.username == ctx.session.username) {
+            ctx.body = {
+                message: "chatroom does not exist."
+            }
+            ctx.status = 404
+            return
+        }
     }
 
     let room = rooms[0]
