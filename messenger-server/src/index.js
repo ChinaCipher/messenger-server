@@ -1,7 +1,6 @@
 require('@babel/polyfill')
 const Koa = require('koa')
 const Router = require('koa-router')
-const cors = require('koa-cors')
 const body = require('koa-body')
 const logger = require('koa-logger')
 const statics = require('koa-static')
@@ -21,6 +20,7 @@ app.keys = config.app.keys || ['some secret hurr']
 
 let args = process.argv.slice(2)
 if (args[0] == '--allow-cors') {
+    const cors = require('koa-cors')
     app.use(cors({
         origin: "http://localhost:8080",
         credentials: true
