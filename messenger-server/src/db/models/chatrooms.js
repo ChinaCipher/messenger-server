@@ -3,16 +3,16 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 let user = new Schema({
-    "username": { type: String, index: true, minlength: 8, maxlength: 30 },
-    "messageKey": { type: String, index: true }
+    "username": { type: String, index: true, minlength: 8, maxlength: 30, default: '' },
+    "messageKey": { type: String, index: true, default: '' }
 })
 
 let message = new Schema({
     "id": { type: Number, index: true, default: 1 },
-    "timestamp": { type: Date, default: Date.now },
-    "sender": { type: String, index: true },
-    "type": { type: String, index: true },
-    "content": { type: String, index: true },
+    "timestamp": { type: String, default: '' },
+    "sender": { type: String, index: true, default: '' },
+    "type": { type: String, index: true, default: '' },
+    "content": { type: String, index: true, default: '' },
     "options": { type: Object, index: true, default: {} }
 })
 
