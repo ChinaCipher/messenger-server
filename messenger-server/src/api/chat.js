@@ -337,6 +337,8 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
+    let room = rooms[0]
+
     if (!room.visibility) {
         if (room.userB.username == ctx.session.username) {
             ctx.body = {
@@ -346,8 +348,6 @@ router.get('/:username/message/:messageId', async ctx => {
             return
         }
     }
-
-    let room = rooms[0]
 
     if (messageId > room.messages.length) {
         ctx.body = {
