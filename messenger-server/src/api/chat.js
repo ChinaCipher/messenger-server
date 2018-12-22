@@ -2,13 +2,11 @@ const crypto = require('crypto')
 const Router = require('koa-router')
 
 const User = require('../db/user')
+const Chatroom = require('../db/chatroom')
 const ecies = require('../util/ecies')
 
 const router = new Router()
 
-
-// temp
-let temprooms = {}
 
 router.get('/', async ctx => {
     if (!ctx.session.login) {
@@ -19,10 +17,18 @@ router.get('/', async ctx => {
         return
     }
 
-    // temp
+    const data = await Chatroom.find(ctx.session.username, null)
+
     let rooms = []
-    for (const username in temprooms) {
-        let user = await User.find(temprooms[username].userB.username)
+    for (const index in data) {
+        let user = ''
+        if (data[index].userA.username == ctx.session.username) {
+            user = await User.find(data[index].userB.username)
+        }
+        else {
+            user = await User.find(data[index].userA.username)
+        }
+
         let room = {
             avatar: user.avatar,
             username: user.username,
@@ -56,8 +62,10 @@ router.post('/', async ctx => {
         return
     }
 
-    // temp
-    if (temprooms[username]) {
+    let userA = await User.find(ctx.session.username)
+    let userB = user
+    let rooms = await Chatroom.find(userA.username, userB.username)
+    if (rooms.length) {
         ctx.body = {
             message: "chatroom already exists."
         }
@@ -65,13 +73,9 @@ router.post('/', async ctx => {
         return
     }
 
-    let originalMessageKey = crypto.randomBytes(32)
+    let originalMessageKey = crypto.randomBytes(32).toString('hex').slice(0, 32)
 
-    let userA = await User.find(ctx.session.username)
-    let userB = user
-
-    // temp
-    let temproom = {
+    let room = {
         userA: {
             username: userA.username,
             messageKey: JSON.stringify(await ecies.encrypt(userA.publicKey, originalMessageKey))
@@ -82,11 +86,11 @@ router.post('/', async ctx => {
         },
         messages: []
     }
-    temprooms[username] = temproom
 
-    // temp
+    await Chatroom.create(room)
+
     ctx.body = {
-        messageKey: temproom.userA.messageKey
+        messageKey: room.userA.messageKey
     }
 })
 
@@ -101,8 +105,19 @@ router.get('/:username', async ctx => {
         return
     }
 
-    // temp
-    if (!temprooms[username]) {
+    let user = await User.find(username)
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    let userA = await User.find(ctx.session.username)
+    let userB = user
+    let rooms = await Chatroom.find(userA.username, userB.username)
+    if (!rooms.length) {
         ctx.body = {
             message: "chatroom does not exist."
         }
@@ -110,8 +125,17 @@ router.get('/:username', async ctx => {
         return
     }
 
-    ctx.body = {
-        messageKey: temprooms[username].userA.messageKey
+    let room = rooms[0]
+
+    if (room.userA.username == ctx.session.username) {
+        ctx.body = {
+            messageKey: room.userA.messageKey
+        }
+    }
+    else {
+        ctx.body = {
+            messageKey: room.userB.messageKey
+        }
     }
 })
 
@@ -128,8 +152,19 @@ router.get('/:username/message', async ctx => {
         return
     }
 
-    // temp
-    if (!temprooms[username]) {
+    let user = await User.find(username)
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    let userA = await User.find(ctx.session.username)
+    let userB = user
+    let rooms = await Chatroom.find(userA.username, userB.username)
+    if (!rooms.length) {
         ctx.body = {
             message: "chatroom does not exist."
         }
@@ -137,18 +172,29 @@ router.get('/:username/message', async ctx => {
         return
     }
 
-    // temp
-    let messages = temprooms[username].messages
+    let room = rooms[0]
 
-    // temp
-    index = index || messages.length - 1
+    let messages = room.messages
+
+    index = index || messages.length
     count = count || 1
 
-    // temp
     messages = messages.slice(Math.max(0, index - count), index)
 
+    let result = []
+    messages.forEach(message => {
+        result.push({
+            id: message.id,
+            sender: message.sender,
+            type: message.type,
+            content: message.content,
+            options: message.options,
+            timestamp: message._timestamp
+        })
+    });
+
     ctx.body = {
-        messages
+        messages: result
     }
 })
 
@@ -166,8 +212,19 @@ router.post('/:username/message', async ctx => {
         return
     }
 
-    // temp
-    if (!temprooms[username]) {
+    let user = await User.find(username)
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    let userA = await User.find(ctx.session.username)
+    let userB = user
+    let rooms = await Chatroom.find(userA.username, userB.username)
+    if (!rooms.length) {
         ctx.body = {
             message: "chatroom does not exist."
         }
@@ -175,9 +232,12 @@ router.post('/:username/message', async ctx => {
         return
     }
 
-    // temp
+    let room = rooms[0]
+
+    let id = room.messages.length + 1
+
     let message = {
-        id: temprooms[username].messages.length + 1,
+        id,
         sender: ctx.session.username,
         type,
         content,
@@ -185,12 +245,9 @@ router.post('/:username/message', async ctx => {
         timestamp: new Date()
     }
 
-    // temp
-    temprooms[username].messages.push(message)
+    await room.postMessage(message)
 
-    ctx.body = {
-        message
-    }
+    ctx.body = message
 })
 
 router.get('/:username/message/:messageId', async ctx => {
@@ -205,8 +262,19 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-    // temp
-    if (!temprooms[username]) {
+    let user = await User.find(username)
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
+    let userA = await User.find(ctx.session.username)
+    let userB = user
+    let rooms = await Chatroom.find(userA.username, userB.username)
+    if (!rooms.length) {
         ctx.body = {
             message: "chatroom does not exist."
         }
@@ -214,8 +282,9 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-    // temp
-    if (messageId > temprooms[username].messages.length) {
+    let room = rooms[0]
+
+    if (messageId > room.messages.length) {
         ctx.body = {
             message: "message does not exist."
         }
@@ -223,10 +292,16 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-    // temp
-    let message = temprooms[username].messages[messageId - 1]
+    let message = room.messages[messageId - 1]
 
-    ctx.body = message
+    ctx.body = {
+        id: message.id,
+        sender: message.sender,
+        type: message.type,
+        content: message.content,
+        options: message.options,
+        timestamp: message._timestamp
+    }
 })
 
 module.exports = router 
