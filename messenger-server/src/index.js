@@ -2,10 +2,10 @@ require('@babel/polyfill')
 const Koa = require('koa')
 const Router = require('koa-router')
 const cors = require('koa-cors')
+const body = require('koa-body')
 const logger = require('koa-logger')
 const statics = require('koa-static')
 const session = require('koa-session')
-const bodyparser = require('koa-bodyparser')
 
 const config = require('./config')
 const db = require('./db/server')
@@ -31,8 +31,8 @@ if (args[0] == '--allow-cors') {
 }
 
 app.use(logger())
-app.use(bodyparser())
 app.use(statics(__dirname + '/../public'))
+app.use(body())
 app.use(session({
     key: config.session.key || 'koa:sess',
     maxAge: config.session.maxAge || 86400000,
