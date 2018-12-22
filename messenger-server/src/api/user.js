@@ -38,7 +38,7 @@ router.post('/', async ctx => {
         username,
         password: await bcrypt.hash(secret, '$2b$10$' + sha256.hash(username).slice(0, 22)),
         nickname: username,
-        avatar: "https://ccm.ntut.com.tw/img/default_avatar.png",
+        avatar: "img/default_avatar.png",
         publicKey: pair.publicKey,
         privateKey: aes.encrypt(pair.privateKey, key, iv)
     }
@@ -96,6 +96,15 @@ router.patch('/:username', async ctx => {
         return
     }
 
+    let user = await User.find(username)
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
+        return
+    }
+
     if (username != ctx.session.username) {
         ctx.body = {
             message: "permission denied."
@@ -129,6 +138,15 @@ router.patch('/:username/password', async ctx => {
             message: "not logged in."
         }
         ctx.status = 401
+        return
+    }
+
+    let user = await User.find(username)
+    if (!user) {
+        ctx.body = {
+            message: "username does not exist."
+        }
+        ctx.status = 404
         return
     }
 
