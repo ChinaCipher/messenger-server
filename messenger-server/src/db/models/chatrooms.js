@@ -18,6 +18,7 @@ let message = new Schema({
 
 let chatroom = new Schema({
     "messages": [message],
+    "visibility": { type: Boolean, default: false },
     "userA": { type: user, index: { unique: true, dropDups: true } },
     "userB": { type: user, index: { unique: true, dropDups: true } }
 })
