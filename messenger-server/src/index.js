@@ -23,7 +23,7 @@ let args = process.argv.slice(2)
 if (args[0] == '--allow-cors') {
     const cors = require('koa-cors')
     app.use(cors({
-        origin: "http://localhost:8080",
+        origin: 'http://localhost:8080',
         credentials: true
     }))
 
