@@ -52,7 +52,34 @@ app.use(router.routes()).use(router.allowedMethods())
 const server = http.createServer(app.callback())
 const io = socketio(server)
 
-io.on('connection', () => { })
+io.on('connection', socket => {
+    let ctx = app.createContext(socket.request, new http.OutgoingMessage())
+    socket.session = ctx.session
+    console.log(socket.session)
+    console.log('welcome!')
+
+    if (!socket.session.login) {
+        console.log('you should not pass')
+        new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve()
+            }, 3000)
+        }).then(() => {
+            socket.disconnect()
+        })
+    }
+
+    socket.on('wow', data => {
+        console.log(data)
+    })
+
+    socket.on('disconnect', () => {
+        let ctx = app.createContext(socket.request, new http.OutgoingMessage())
+        socket.session = ctx.session
+        console.log(socket.session)
+        console.log('exit...')
+    })
+})
 
 server.listen(config.app.port || 8787, () => {
     console.log(`Server is running on http://localhost:${config.app.port || 8787}.`)
