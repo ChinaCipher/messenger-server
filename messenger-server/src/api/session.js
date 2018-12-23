@@ -96,6 +96,10 @@ router.delete('/', async ctx => {
         return
     }
 
+    if (ctx.sockets[ctx.session.id]) {
+        ctx.sockets[ctx.session.id].disconnect()
+    }
+
     ctx.session.username = undefined
     ctx.session.login = false
     ctx.session.id = undefined
