@@ -1,5 +1,5 @@
 const crypto = require('crypto')
-const eccrypto = require("eccrypto")
+const eccrypto = require('eccrypto')
 
 
 const generateKeyPair = () => {

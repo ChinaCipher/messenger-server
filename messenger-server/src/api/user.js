@@ -38,7 +38,7 @@ router.post('/', async ctx => {
         username,
         password: await bcrypt.hash(secret, '$2b$10$' + sha256.hash(username).slice(0, 22)),
         nickname: username,
-        avatar: "img/default_avatar.png",
+        avatar: 'img/default_avatar.png',
         publicKey: pair.publicKey,
         privateKey: aes.encrypt(pair.privateKey, key, iv)
     }

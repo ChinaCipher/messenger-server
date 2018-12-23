@@ -72,7 +72,7 @@ router.post('/', async ctx => {
 
     ctx.session.username = username
     ctx.session.login = true
-    ctx.session.id = crypto.randomBytes(16).toString('hex')
+    ctx.session.id = crypto.randomBytes(4).toString('hex')
 
     ctx.body = {
         user: {
@@ -96,8 +96,10 @@ router.delete('/', async ctx => {
         return
     }
 
-    if (ctx.sockets[ctx.session.username][ctx.session.id]) {
-        ctx.sockets[ctx.session.username][ctx.session.id].disconnect()
+    if (ctx.sockets[ctx.session.username]) {
+        if (ctx.sockets[ctx.session.username][ctx.session.id]) {
+            ctx.sockets[ctx.session.username][ctx.session.id].disconnect()
+        }
     }
 
     ctx.session.username = undefined
