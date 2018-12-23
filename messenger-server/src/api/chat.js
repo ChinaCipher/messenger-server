@@ -287,6 +287,9 @@ router.post('/:username/message', async ctx => {
             ctx.status = 404
             return
         }
+        else {
+            room.visibility = true
+        }
     }
 
     let id = room.messages.length + 1
