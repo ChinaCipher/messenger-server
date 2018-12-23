@@ -16,17 +16,16 @@ const setupServer = (app) => {
     const io = socketio(server)
 
     io.on('connection', socket => {
-        console.log('connect')
         const ctx = app.createContext(socket.request, new http.OutgoingMessage())
+        console.log("Socket.io client connected!", {
+            username: ctx.session.username,
+            id: ctx.session.id
+        })
 
         if (!ctx.session.login) {
-            new Promise((resolve) => {
-                setTimeout(() => {
-                    resolve()
-                }, 3000)
-            }).then(() => {
+            setTimeout(() => {
                 socket.disconnect()
-            })
+            }, 3000)
         }
 
         if (!sockets[ctx.session.username]) {
@@ -35,8 +34,11 @@ const setupServer = (app) => {
         sockets[ctx.session.username][ctx.session.id] = socket
 
         socket.on('disconnect', () => {
-            console.log('disconnect')
             const ctx = app.createContext(socket.request, new http.OutgoingMessage())
+            console.log("Socket.io client disconnected!", {
+                username: ctx.session.username,
+                id: ctx.session.id
+            })
 
             if (sockets[ctx.session.username][ctx.session.id]) {
                 sockets[ctx.session.username][ctx.session.id] = undefined

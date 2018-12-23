@@ -310,14 +310,20 @@ router.post('/:username/message', async ctx => {
     await room.postMessage(message)
 
     if (ctx.sockets[username]) {
-        Object.values(ctx.sockets[username]).forEach(socket => {
-            if (socket) {
-                socket.emit('message', {
-                    id,
-                    sender
-                })
+        for (id in ctx.sockets[username]) {
+            const socket = ctx.sockets[username][id]
+            if (!socket) {
+                continue
             }
-        })
+            console.log("Notify Socket.io client", {
+                username,
+                id
+            })
+            socket.emit('message', {
+                id,
+                sender
+            })
+        }
     }
 
     ctx.body = message
