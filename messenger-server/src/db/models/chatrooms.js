@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 let user = new Schema({
-    "username": { type: String, index: true, minlength: 8, maxlength: 30, default: '' },
+    "username": { type: String, index: true, minlength: 3, maxlength: 30, default: '' },
     "messageKey": { type: String, index: true, default: '' }
 })
 
