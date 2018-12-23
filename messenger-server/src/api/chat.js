@@ -307,7 +307,7 @@ router.post('/:username/message', async ctx => {
     await room.postMessage(message)
 
     if (ctx.sockets[username]) {
-        ctx.sockets[username].forEach(socket => {
+        Object.values(ctx.sockets[username]).forEach(socket => {
             socket.emit('message', {
                 id,
                 sender
