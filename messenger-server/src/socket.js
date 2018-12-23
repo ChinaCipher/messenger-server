@@ -5,12 +5,7 @@ const sockets = {}
 
 const middleware = () => {
     return async (ctx, next) => {
-        if (ctx.session.login) {
-            ctx.sockets = sockets[ctx.session.username]
-        }
-        else {
-            ctx.sockets = undefined
-        }
+        ctx.sockets = sockets
         await next()
     }
 }
