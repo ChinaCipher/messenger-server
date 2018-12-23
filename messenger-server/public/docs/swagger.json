@@ -1,0 +1,955 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "description",
+        "version": "1.0.0",
+        "title": "China Cipher Messenger Server",
+        "contact": {
+            "email": "t105590035@gmail.com"
+        },
+        "license": {
+            "name": "MIT License",
+            "url": "https://github.com/ChinaCipher/messenger-server/blob/master/LICENSE"
+        }
+    },
+    "host": "ccm.ntut.com.tw",
+    "basePath": "/api",
+    "tags": [
+        {
+            "name": "TestApi",
+            "description": "測試相關"
+        },
+        {
+            "name": "UserApi",
+            "description": "使用者相關"
+        },
+        {
+            "name": "ChatApi",
+            "description": "聊天相關"
+        }
+    ],
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/": {
+            "get": {
+                "tags": [
+                    "TestApi"
+                ],
+                "summary": "顯示歡迎訊息",
+                "description": "顯示歡迎訊息",
+                "operationId": "welcome",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Welcome"
+                        }
+                    }
+                }
+            }
+        },
+        "/session": {
+            "get": {
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "取得會話驗證碼",
+                "description": "長度為 22 個 ASCII 字元",
+                "operationId": "get_session_code",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Session.Info"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "建立會話",
+                "description": "`password` 格式為：`bcrypt(bcrypt(明文密碼, sha256(用戶名稱).slice(0, 22)), 會話驗證碼)`",
+                "operationId": "login",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "所需的資料",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Login.Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/User.Profile.Private"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "移除會話",
+                "description": "",
+                "operationId": "logout",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "post": {
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "註冊新帳號",
+                "description": "`secret` 為明文密碼",
+                "operationId": "register",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "所需的資料",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Register.Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/User.Profile"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{username}": {
+            "get": {
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "取得使用者資訊",
+                "description": "",
+                "operationId": "search_user",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/User.Profile"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "修改使用者資訊",
+                "description": "",
+                "operationId": "edit_user",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "所需的資料",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User.Profile.Editable"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/User.Profile"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{username}/password": {
+            "patch": {
+                "tags": [
+                    "UserApi"
+                ],
+                "summary": "修改使用者密碼",
+                "description": "",
+                "operationId": "change_password",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "所需的資料",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User.Password"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/chat": {
+            "get": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "取得聊天室列表",
+                "description": "",
+                "operationId": "get_rooms",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Chat.Rooms"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "建立聊天室",
+                "description": "",
+                "operationId": "create_room",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "所需的資料",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User.Username"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Chat.Room"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/chat/{username}": {
+            "get": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "取得聊天室資訊",
+                "description": "",
+                "operationId": "get_room",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/Chat.Room"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "移除聊天室",
+                "description": "",
+                "operationId": "delete_room",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/chat/{username}/message": {
+            "get": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "取得訊息列表",
+                "description": "",
+                "operationId": "get_messages",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "index",
+                        "in": "query",
+                        "description": "從第幾筆資料開始",
+                        "type": "integer"
+                    },
+                    {
+                        "name": "count",
+                        "in": "query",
+                        "description": "取幾筆資料",
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/Chat.Messages"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "發送訊息",
+                "description": "",
+                "operationId": "send_message",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "要發送的訊息",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Chat.Content"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/Chat.Message"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            }
+        },
+        "/chat/{username}/message/{messageId}": {
+            "get": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "取得訊息",
+                "description": "",
+                "operationId": "get_message",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "description": "訊息 ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/Chat.Message"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "修改訊息",
+                "description": "",
+                "operationId": "put_message",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "description": "訊息 ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "所需的資料",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Chat.Content.Editable"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Chat.Message"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "ChatApi"
+                ],
+                "summary": "刪除訊息",
+                "description": "",
+                "operationId": "delete_message",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "使用者名稱",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "description": "訊息 ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Test.Message"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Test.Welcome": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "description": "版本號碼",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "訊息內容",
+                    "type": "string"
+                }
+            }
+        },
+        "Test.Message": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "description": "訊息內容",
+                    "type": "string"
+                }
+            }
+        },
+        "Session.Info": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "會話驗證碼",
+                    "type": "string"
+                },
+                "profile": {
+                    "description": "使用者資訊",
+                    "$ref": "#/definitions/User.Profile.Private"
+                }
+            }
+        },
+        "Register.Request": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "description": "使用者名稱",
+                    "type": "string"
+                },
+                "secret": {
+                    "description": "使用者明文密碼",
+                    "type": "string"
+                }
+            }
+        },
+        "Login.Request": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "description": "使用者名稱",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "使用者密文密碼",
+                    "type": "string"
+                }
+            }
+        },
+        "User.Profile": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "大頭貼網址",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "使用者名稱",
+                    "type": "string"
+                },
+                "nickname": {
+                    "description": "使用者暱稱",
+                    "type": "string"
+                }
+            }
+        },
+        "User.Username": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "description": "使用者名稱",
+                    "type": "string"
+                }
+            }
+        },
+        "User.Password": {
+            "type": "object",
+            "properties": {
+                "oldSecret": {
+                    "description": "使用者舊明文密碼",
+                    "type": "string"
+                },
+                "newSecret": {
+                    "description": "使用者新明文密碼",
+                    "type": "string"
+                }
+            }
+        },
+        "User.Profile.Editable": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "大頭貼網址",
+                    "type": "string"
+                },
+                "nickname": {
+                    "description": "使用者暱稱",
+                    "type": "string"
+                }
+            }
+        },
+        "User.Profile.Private": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "description": "使用者資訊",
+                    "$ref": "#/definitions/User.Profile"
+                },
+                "privateKey": {
+                    "description": "加密過後的使用者私鑰",
+                    "type": "string"
+                }
+            }
+        },
+        "Chat.Rooms": {
+            "type": "object",
+            "properties": {
+                "rooms": {
+                    "description": "房間列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/User.Profile"
+                    }
+                }
+            }
+        },
+        "Chat.Room": {
+            "type": "object",
+            "properties": {
+                "messageKey": {
+                    "description": "加密過後的訊息金鑰",
+                    "type": "string"
+                }
+            }
+        },
+        "Chat.Messages": {
+            "type": "object",
+            "properties": {
+                "messages": {
+                    "description": "訊息列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Chat.Message"
+                    }
+                }
+            }
+        },
+        "Chat.Message": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "訊息 ID",
+                    "type": "integer"
+                },
+                "sender": {
+                    "description": "發送者名稱",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "訊息種類",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "訊息內容",
+                    "type": "string"
+                },
+                "options": {
+                    "description": "選填內容",
+                    "type": "object"
+                },
+                "timestamp": {
+                    "description": "時間戳記",
+                    "type": "string"
+                }
+            }
+        },
+        "Chat.Content": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "訊息種類",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "訊息內容",
+                    "type": "string"
+                },
+                "options": {
+                    "description": "選填內容",
+                    "type": "object"
+                }
+            }
+        },
+        "Chat.Content.Editable": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "訊息內容",
+                    "type": "string"
+                },
+                "options": {
+                    "description": "選填內容",
+                    "type": "object"
+                }
+            }
+        }
+    }
+}
