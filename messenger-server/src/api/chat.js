@@ -308,10 +308,12 @@ router.post('/:username/message', async ctx => {
 
     if (ctx.sockets[username]) {
         Object.values(ctx.sockets[username]).forEach(socket => {
-            socket.emit('message', {
-                id,
-                sender
-            })
+            if (socket) {
+                socket.emit('message', {
+                    id,
+                    sender
+                })
+            }
         })
     }
 
