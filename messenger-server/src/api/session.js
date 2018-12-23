@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 const Router = require('koa-router')
 
@@ -71,6 +72,7 @@ router.post('/', async ctx => {
 
     ctx.session.username = username
     ctx.session.login = true
+    ctx.session.id = crypto.randomBytes(16).toString('hex')
 
     ctx.body = {
         user: {
@@ -96,6 +98,7 @@ router.delete('/', async ctx => {
 
     ctx.session.username = undefined
     ctx.session.login = false
+    ctx.session.id = undefined
 
     ctx.status = 204
 })
