@@ -72,7 +72,7 @@ router.post('/', async ctx => {
 
     ctx.session.username = username
     ctx.session.login = true
-    ctx.session.id = crypto.randomBytes(16).toString('hex')
+    ctx.session.id = crypto.randomBytes(4).toString('hex')
 
     ctx.body = {
         user: {
