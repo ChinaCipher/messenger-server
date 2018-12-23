@@ -43,7 +43,9 @@ const setupServer = (app) => {
             console.log('disconnect')
             const ctx = app.createContext(socket.request, new http.OutgoingMessage())
 
-            sockets[ctx.session.username][ctx.session.id] = undefined
+            if (sockets[ctx.session.username][ctx.session.id]) {
+                sockets[ctx.session.username][ctx.session.id] = undefined
+            }
         })
     })
 
