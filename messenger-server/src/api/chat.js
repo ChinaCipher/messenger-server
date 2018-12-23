@@ -291,16 +291,29 @@ router.post('/:username/message', async ctx => {
 
     let id = room.messages.length + 1
 
+    let sender = ctx.session.username
+
+    let timestamp = new Date()
+
     let message = {
         id,
-        sender: ctx.session.username,
+        sender,
         type,
         content,
         options,
-        timestamp: new Date()
+        timestamp
     }
 
     await room.postMessage(message)
+
+    if (ctx.sockets[username]) {
+        ctx.sockets[username].forEach(socket => {
+            socket.emit('message', {
+                id,
+                sender
+            })
+        })
+    }
 
     ctx.body = message
 })

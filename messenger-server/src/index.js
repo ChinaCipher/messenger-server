@@ -9,6 +9,7 @@ const session = require('koa-session')
 const config = require('./config')
 const db = require('./db/server')
 const api = require('./route')
+const socket = require('./socket')
 
 
 const app = new Koa()
@@ -43,10 +44,13 @@ app.use(session({
     rolling: false,
     renew: false,
 }, app))
+app.use(socket.middleware())
 
 router.use('/api', api.router.routes(), api.router.allowedMethods())
 app.use(router.routes()).use(router.allowedMethods())
 
-app.listen(config.app.port || 8787, () => {
+const server = socket.setupServer(app)
+
+server.listen(config.app.port || 8787, () => {
     console.log(`Server is running on http://localhost:${config.app.port || 8787}.`)
 })
