@@ -310,7 +310,7 @@ router.post('/:username/message', async ctx => {
     await room.postMessage(message)
 
     if (ctx.sockets[username]) {
-        for (socketid in ctx.sockets[username]) {
+        for (let socketid in ctx.sockets[username]) {
             const socket = ctx.sockets[username][socketid]
             if (!socket) {
                 continue
