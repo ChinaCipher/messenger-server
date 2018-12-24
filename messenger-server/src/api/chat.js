@@ -309,19 +309,38 @@ router.post('/:username/message', async ctx => {
 
     await room.postMessage(message)
 
-    if (ctx.sockets[username]) {
-        for (let socketid in ctx.sockets[username]) {
-            const socket = ctx.sockets[username][socketid]
+    if (ctx.sockets[userA.username]) {
+        for (let socketid in ctx.sockets[userA.username]) {
+            const socket = ctx.sockets[userA.username][socketid]
             if (!socket) {
                 continue
             }
             console.log("Notify Socket.io client", {
-                username,
+                username: userA.username,
                 socketid
             })
             socket.emit('message', {
                 id,
-                sender
+                // 之後會改名叫做 username
+                sender: userB.username
+            })
+        }
+    }
+
+    if (ctx.sockets[userB.username]) {
+        for (let socketid in ctx.sockets[userB.username]) {
+            const socket = ctx.sockets[userB.username][socketid]
+            if (!socket) {
+                continue
+            }
+            console.log("Notify Socket.io client", {
+                username: userB.username,
+                socketid
+            })
+            socket.emit('message', {
+                id,
+                // 之後會改名叫做 username
+                sender: userA.username
             })
         }
     }
