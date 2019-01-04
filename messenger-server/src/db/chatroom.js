@@ -18,6 +18,7 @@ class Chatroom {
      * @param {String} usernameB 
      * @param {String} fields 
      */
+    // 搜尋聊天室
     static async find(usernameA, usernameB, fields) {
         let chatroomList = null
         if (usernameB === null) {
@@ -42,11 +43,11 @@ class Chatroom {
 
         return result
     }
-
+    // 建立聊天室
     static async create(chatdata) {
         await chatrooms(chatdata).save()
     }
-
+    // 更新聊天室訊息
     async postMessage(msgdata) {
         let chatdata = await chatrooms.findByUsersname({
             "userA": this._userA,
@@ -60,7 +61,7 @@ class Chatroom {
         })
         this._messages.push(new Message(newchatdata.messages, this._userA.username, this._userB.username))
     }
-
+    // 更新聊天室
     static async _update(usernameA, usernameB, value, option) {
         await chatrooms.update({
             "$or": [
@@ -69,7 +70,7 @@ class Chatroom {
             ]
         }, { "$set": { [option]: value } })
     }
-
+    // getter and setter
     set userA(value) {
         Chatroom._update(this._userA.username, this._userB.username, value, 'userA')
         this._userA = value

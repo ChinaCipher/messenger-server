@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const config = require('../config')
-
+// 與 db 連接相關設定
 function connect() {
     const userString = `${config.database.user}:${config.database.pswd}`
     const connString = `mongodb://${userString}@${config.database.host}/CCM?authSource=admin`

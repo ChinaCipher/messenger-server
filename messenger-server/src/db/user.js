@@ -12,7 +12,7 @@ class User {
         this._publicKey = user.publicKey
         this._privateKey = user.privateKey
     }
-
+    // getter and setter
     set username(value) {
         User._update(this._username, value, 'username')
         this._username = value
@@ -61,11 +61,11 @@ class User {
     get privateKey() {
         return this._privateKey
     }
-
+    // 更新使用者資料
     static async _update(username, value, opction) {
         await users.update({ username }, { '$set': { [opction]: value } })
     }
-
+    // 搜尋使者
     static async find(username) {
         let user = await users.findByUsername(username)
         if (!user) {
@@ -73,7 +73,7 @@ class User {
         }
         return new User(user)
     }
-
+    // 建立使用者
     static async create(user) {
         await users(user).save()
     }
