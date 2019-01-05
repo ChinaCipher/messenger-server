@@ -11,7 +11,7 @@ class Message {
         this._usernameA = usernameA
         this._usernameB = usernameB
     }
-
+    // getter and setter
     get id() {
         return this._id
     }
