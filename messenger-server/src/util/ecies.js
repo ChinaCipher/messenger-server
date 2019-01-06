@@ -27,9 +27,9 @@ const decrypt = async (key, ciphertext) => {
         ciphertext[key] = Buffer.from(ciphertext[key], 'hex')
     });
 
-    let plaintext = await eccrypto.decrypt(Buffer.from(key, 'hex'), ciphertext)
-    
-    return plaintext.toString('utf8')
+    let plaintext = (await eccrypto.decrypt(Buffer.from(key, 'hex'), ciphertext)).toString('utf8')
+
+    return plaintext
 }
 
 module.exports = {
