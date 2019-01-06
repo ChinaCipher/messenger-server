@@ -19,6 +19,7 @@ db.connect()
 
 app.keys = config.app.keys || ['some secret hurr']
 
+// 供網頁前端開發時解除 cors 限制
 let args = process.argv.slice(2)
 if (args[0] == '--allow-cors') {
     const cors = require('koa-cors')
