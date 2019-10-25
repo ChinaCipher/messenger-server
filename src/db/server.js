@@ -3,7 +3,7 @@ const config = require('../config')
 // 與 db 連接相關設定
 function connect() {
     const userString = `${config.database.user}:${config.database.pswd}`
-    const connString = `mongodb://${userString}@${config.database.host}/CCM?authSource=admin`
+    const connString = `mongodb://${userString}@${config.database.host}/ChinaCipherMessenger?authSource=admin`
     mongoose.connect(connString, { useNewUrlParser: true, autoIndex: false })
 
     // MongoDB 連接成功後回調，這裡僅輸出一行日誌
