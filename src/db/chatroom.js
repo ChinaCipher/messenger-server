@@ -1,4 +1,4 @@
-const chatrooms = require('./models/chatrooms')
+const chatrooms = require('../models/chatrooms')
 const Message = require('./message')
 
 class Chatroom {
@@ -13,10 +13,10 @@ class Chatroom {
     }
 
     /**
-     * 
-     * @param {String} usernameA 
-     * @param {String} usernameB 
-     * @param {String} fields 
+     *
+     * @param {String} usernameA
+     * @param {String} usernameB
+     * @param {String} fields
      */
     // 搜尋聊天室
     static async find(usernameA, usernameB, fields) {

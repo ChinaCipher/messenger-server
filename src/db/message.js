@@ -1,4 +1,4 @@
-const chatrooms = require('./models/chatrooms')
+const chatrooms = require('../models/chatrooms')
 
 class Message {
     constructor(msgdata, usernameA, usernameB) {

@@ -1,8 +1,8 @@
-const users = require('./models/users')
+const users = require('../models/users')
 
 class User {
     /**
-     * @param {Object} user 
+     * @param {Object} user
      */
     constructor(user) {
         this._nickname = user.nickname
