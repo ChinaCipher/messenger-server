@@ -1,7 +1,7 @@
 {
   "name": "messenger-server",
   "version": "1.0.0",
-  "main": "messenger-server/src/index.js",
+  "main": "src/index.js",
   "repository": "https://github.com/ChinaCipher/messenger-server",
   "author": "Pin Lin <moneycat711@gmail.com>",
   "license": "MIT",
@@ -28,8 +28,8 @@
     "nodemon": "^1.18.8"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node messenger-server/src/index.js --allow-cors",
-    "build": "babel messenger-server/src --out-dir messenger-server/dist",
-    "serve": "node messenger-server/dist"
+    "dev": "nodemon --exec babel-node src/index.js --allow-cors",
+    "build": "babel src --out-dir dist",
+    "serve": "node dist"
   }
 }
