@@ -6,12 +6,12 @@ const Schema = mongoose.Schema
 //default: 默認值
 // 定義 users 儲存結構
 const users = new Schema({
-    "username": { type: String, index: { unique: true, dropDups: true }, minlength: 3, maxlength: 30 },
-    "password": { type: String, match: /\w+/, index: true },
-    "avatar": { type: String, index: true, default: '' },
-    "nickname": { type: String, index: true, default: '' },
-    "privateKey": { type: String, index: true },
-    "publicKey": { type: String, index: true },
+    username: { type: String, index: { unique: true, dropDups: true }, minlength: 3, maxlength: 30 },
+    password: { type: String, match: /\w+/, index: true },
+    avatar: { type: String, index: true, default: '' },
+    nickname: { type: String, index: true, default: '' },
+    privateKey: { type: String, index: true },
+    publicKey: { type: String, index: true },
 })
 
 //靜態方法，按用戶名查找，因為 username 加了唯一索引，
