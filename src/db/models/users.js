@@ -7,7 +7,7 @@ const Schema = mongoose.Schema
 // 定義 users 儲存結構
 const users = new Schema({
     "username": { type: String, index: { unique: true, dropDups: true }, minlength: 3, maxlength: 30 },
-    "password": { type: String, match: /\w+/, index: true},
+    "password": { type: String, match: /\w+/, index: true },
     "avatar": { type: String, index: true, default: '' },
     "nickname": { type: String, index: true, default: '' },
     "privateKey": { type: String, index: true },
