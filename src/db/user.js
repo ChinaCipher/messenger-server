@@ -67,7 +67,7 @@ class User {
     }
     // 搜尋使者
     static async find(username) {
-        let user = await users.findByUsername(username)
+        let user = await users.find(username)
         if (!user) {
             return null
         }

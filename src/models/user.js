@@ -12,7 +12,7 @@ const user = new Schema({
 })
 
 // 定義 user 的 static 方法
-user.statics.findByUsername = function (username) {
+user.statics.find = function (username) {
     return this.findOne({ username: username })
 }
 
