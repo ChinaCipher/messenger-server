@@ -15,7 +15,7 @@ router.post('/', async ctx => {
     const username = ctx.request.body.username
     const secret = ctx.request.body.secret
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (user) {
         // 已經有這個使用者，註冊失敗
         ctx.body = {
@@ -64,7 +64,7 @@ router.post('/', async ctx => {
     }
 
     // 註冊成功
-    user = await User.find(username)
+    user = await User.findOneByUsername(username)
 
     ctx.body = {
         avatar: user.avatar,
@@ -78,7 +78,7 @@ router.post('/', async ctx => {
 router.get('/:username', async ctx => {
     const username = ctx.params.username
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (!user) {
         // 使用者不存在，查詢使用者失敗
         ctx.body = {
@@ -113,7 +113,7 @@ router.patch('/:username', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (!user) {
         // 使用者不存在，更新資訊失敗
         ctx.body = {
@@ -166,7 +166,7 @@ router.patch('/:username/password', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (!user) {
         // 使用者不存在，更新密碼失敗
         ctx.body = {

@@ -13,7 +13,7 @@ router.get('/', async ctx => {
     ctx.session.code = await bcrypt.genSalt(10)
 
     if (ctx.session.login) {
-        let user = await User.find(ctx.session.username)
+        let user = await User.findOneByUsername(ctx.session.username)
 
         if (user) {
             // 如果已登入且找得到該使用者，就順便回傳該使用者資訊
@@ -60,7 +60,7 @@ router.post('/', async ctx => {
     let salt = ctx.session.code
     ctx.session.code = undefined
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (!user) {
         // 沒有這個使用者，登入失敗
         ctx.body = {

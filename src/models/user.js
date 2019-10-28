@@ -12,8 +12,8 @@ const user = new Schema({
 })
 
 // 定義 user 的 static 方法
-user.statics.find = function (username) {
-    return this.findOne({ username: username })
+user.statics.findOneByUsername = function (username) {
+    return this.findOne({ username })
 }
 
 // 建立 user 模型
