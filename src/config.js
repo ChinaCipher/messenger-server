@@ -10,6 +10,7 @@ module.exports = {
     database: {
         host: "localhost:27017",
         username: "XI",
-        password: "ChinaNumberOne"
+        password: "ChinaNumberOne",
+        name: "ChinaCipherMessenger"
     }
 }

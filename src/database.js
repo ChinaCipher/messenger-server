@@ -1,14 +1,16 @@
 const mongoose = require('mongoose')
 const config = require('./config')
+
 // 與 db 連接相關設定
 function connect() {
     const userString = `${config.database.username}:${config.database.password}`
-    const connString = `mongodb://${userString}@${config.database.host}/ChinaCipherMessenger?authSource=admin`
-    mongoose.connect(connString, { useNewUrlParser: true, autoIndex: false })
+    const connectionString = `mongodb://${userString}@${config.database.host}/${config.database.name}?authSource=admin`
+
+    mongoose.connect(connectionString, { useNewUrlParser: true, autoIndex: false })
 
     // MongoDB 連接成功後回調，這裡僅輸出一行日誌
     mongoose.connection.on('connected', () => {
-        console.log('Mongoose default connection open to ' + connString)
+        console.log('Mongoose default connection open to ' + connectionString)
     })
 
     // MongoDB 連接出錯後回調，這裡僅輸出一行日誌
