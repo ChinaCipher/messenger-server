@@ -2,7 +2,7 @@ const crypto = require('crypto')
 const Router = require('koa-router')
 
 const User = require('../models/user')
-const Chatroom = require('../db/chatroom')
+const Chat = require('../db/chat')
 const ecies = require('../util/ecies')
 
 const router = new Router()
@@ -19,7 +19,7 @@ router.get('/', async ctx => {
         return
     }
 
-    const data = await Chatroom.find(ctx.session.username, null)
+    const data = await Chat.find(ctx.session.username, null)
 
     let result = []
     for (const index in data) {
@@ -82,7 +82,7 @@ router.post('/', async ctx => {
     // 取得聊天雙方的使用者物件
     let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
-    let rooms = await Chatroom.find(userA.username, userB.username)
+    let rooms = await Chat.find(userA.username, userB.username)
     if (rooms.length) {
         let room = rooms[0]
 
@@ -128,7 +128,7 @@ router.post('/', async ctx => {
     }
 
     // 建立聊天室成功
-    await Chatroom.create(room)
+    await Chat.create(room)
 
     ctx.body = {
         messageKey: room.userA.messageKey
@@ -161,7 +161,7 @@ router.get('/:username', async ctx => {
 
     let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
-    let rooms = await Chatroom.find(userA.username, userB.username)
+    let rooms = await Chat.find(userA.username, userB.username)
     if (!rooms.length) {
         // 聊天室不存在，查詢聊天室失敗
         ctx.body = {
@@ -226,7 +226,7 @@ router.get('/:username/message', async ctx => {
 
     let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
-    let rooms = await Chatroom.find(userA.username, userB.username)
+    let rooms = await Chat.find(userA.username, userB.username)
     if (!rooms.length) {
         // 聊天室不存在，查詢聊天室訊息失敗
         ctx.body = {
@@ -307,7 +307,7 @@ router.post('/:username/message', async ctx => {
 
     let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
-    let rooms = await Chatroom.find(userA.username, userB.username)
+    let rooms = await Chat.find(userA.username, userB.username)
     if (!rooms.length) {
         // 聊天室不存在，發送訊息失敗
         ctx.body = {
@@ -419,7 +419,7 @@ router.get('/:username/message/:messageId', async ctx => {
 
     let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
-    let rooms = await Chatroom.find(userA.username, userB.username)
+    let rooms = await Chat.find(userA.username, userB.username)
     if (!rooms.length) {
         // 聊天室不存在，查看訊息失敗
         ctx.body = {
