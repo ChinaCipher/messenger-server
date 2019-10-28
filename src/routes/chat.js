@@ -10,42 +10,44 @@ const router = new Router()
 
 // GET /api/chat
 router.get('/', async ctx => {
+    // 如果尚未登入，查詢失敗
     if (!ctx.session.login) {
         ctx.body = {
-            // 尚未登入，查詢聊天室列表失敗
             message: "not logged in."
         }
         ctx.status = 401
         return
     }
 
-    const data = await Chat.findByUsernames(ctx.session.username)
+    const username = ctx.session.username
+
+    const chats = await Chat.findByUsernames(username)
 
     let result = []
-    for (const index in data) {
-        let room = data[index]
+    for (const index in chats) {
+        let chat = chats[index]
 
         // 跳過已存在但不可見的聊天室
-        if (!room.visibility) {
-            if (room.userB.username == ctx.session.username) {
+        if (!chat.visibility) {
+            if (chat.userB.username == username) {
                 continue
             }
         }
 
         // 取得對方使用者物件
-        let user = null
-        if (room.userA.username == ctx.session.username) {
-            user = await User.findOneByUsername(room.userB.username)
+        let opposite = null
+        if (chat.userA.username == username) {
+            opposite = await User.findOneByUsername(chat.userB.username)
         }
         else {
-            user = await User.findOneByUsername(room.userA.username)
+            opposite = await User.findOneByUsername(chat.userA.username)
         }
 
         // 加入結果陣列中
         result.push({
-            avatar: user.avatar,
-            username: user.username,
-            nickname: user.nickname
+            avatar: opposite.avatar,
+            username: opposite.username,
+            nickname: opposite.nickname
         })
     }
 
@@ -57,11 +59,8 @@ router.get('/', async ctx => {
 
 // POST /api/chat
 router.post('/', async ctx => {
-    // 取得要建立聊天室對象的帳號
-    const username = ctx.request.body.username
-
+    // 如果尚未登入，查詢失敗
     if (!ctx.session.login) {
-        // 尚未登入，建立聊天室失敗
         ctx.body = {
             message: "not logged in."
         }
@@ -69,9 +68,13 @@ router.post('/', async ctx => {
         return
     }
 
-    let user = await User.findOneByUsername(username)
-    if (!user) {
-        // 使用者不存在，建立聊天室失敗
+    const username = ctx.session.username
+    const oppositeUsername = ctx.request.body.username
+
+    let opposite = await User.findOneByUsername(oppositeUsername)
+
+    // 使用者不存在，建立聊天室失敗
+    if (!opposite) {
         ctx.body = {
             message: "username does not exist."
         }
@@ -80,30 +83,32 @@ router.post('/', async ctx => {
     }
 
     // 取得聊天雙方的使用者物件
-    let userA = await User.findOneByUsername(ctx.session.username)
-    let userB = user
-    let rooms = await Chat.findByUsernames(userA.username, userB.username)
-    if (rooms.length) {
-        let room = rooms[0]
+    let userA = await User.findOneByUsername(username)
+    let userB = opposite
 
-        if (!room.visibility) {
-            // 聊天室已建立但不可見，直接回傳訊息金鑰
-            if (room.userA.username == ctx.session.username) {
+    let chats = await Chat.findByUsernames(userA.username, userB.username)
+    if (chats.length) {
+        let chat = chats[0]
+
+        // 聊天室已建立但不可見，直接回傳訊息金鑰
+        if (!chat.visibility) {
+            if (chat.userA.username == username) {
                 ctx.body = {
-                    messageKey: room.userA.messageKey
+                    messageKey: chat.userA.messageKey
                 }
             }
             else {
                 ctx.body = {
-                    messageKey: room.userB.messageKey
+                    messageKey: chat.userB.messageKey
                 }
-                room.visibility = true
+                chat.visibility = true
+                chat.save() // TODO: 不確定是否有必要
             }
             return
         }
 
+        // 聊天室已建立且可見，建立聊天室失敗
         ctx.body = {
-            // 聊天室已建立且可見，建立聊天室失敗
             message: "chatroom already exists."
         }
         ctx.status = 403
@@ -114,7 +119,7 @@ router.post('/', async ctx => {
     let originalMessageKey = crypto.randomBytes(32).toString('hex').slice(0, 32)
 
     // 以對話雙方使用者之 EC 公鑰加密
-    let room = {
+    let chat = {
         userA: {
             username: userA.username,
             messageKey: JSON.stringify(await ecies.encrypt(userA.publicKey, originalMessageKey))
@@ -128,20 +133,17 @@ router.post('/', async ctx => {
     }
 
     // 建立聊天室成功
-    await Chat.create(room)
+    await Chat.create(chat)
 
     ctx.body = {
-        messageKey: room.userA.messageKey
+        messageKey: chat.userA.messageKey
     }
 })
 
 // GET /api/chat/<username>
 router.get('/:username', async ctx => {
-    // 取得要查詢聊天室對象的帳號
-    const username = ctx.params.username
-
+    // 如果尚未登入，查詢失敗
     if (!ctx.session.login) {
-        // 尚未登入，查詢聊天室失敗
         ctx.body = {
             message: "not logged in."
         }
@@ -149,9 +151,13 @@ router.get('/:username', async ctx => {
         return
     }
 
-    let user = await User.findOneByUsername(username)
-    if (!user) {
-        // 使用者不存在，查詢聊天室失敗
+    const username = ctx.session.username
+    const oppositeUsername = ctx.params.username
+
+    let opposite = await User.findOneByUsername(oppositeUsername)
+
+    // 使用者不存在，查詢聊天室失敗
+    if (!opposite) {
         ctx.body = {
             message: "username does not exist."
         }
@@ -159,11 +165,13 @@ router.get('/:username', async ctx => {
         return
     }
 
-    let userA = await User.findOneByUsername(ctx.session.username)
-    let userB = user
-    let rooms = await Chat.findByUsernames(userA.username, userB.username)
-    if (!rooms.length) {
-        // 聊天室不存在，查詢聊天室失敗
+    let userA = await User.findOneByUsername(username)
+    let userB = opposite
+
+    let chats = await Chat.findByUsernames(userA.username, userB.username)
+
+    // 聊天室不存在，查詢聊天室失敗
+    if (!chats.length) {
         ctx.body = {
             message: "chatroom does not exist."
         }
@@ -171,11 +179,11 @@ router.get('/:username', async ctx => {
         return
     }
 
-    let room = rooms[0]
+    let chat = chats[0]
 
-    if (!room.visibility) {
-        // 聊天室不可見，查詢聊天室失敗
-        if (room.userB.username == ctx.session.username) {
+    // 聊天室不可見，查詢聊天室失敗
+    if (!chat.visibility) {
+        if (chat.userB.username == username) {
             ctx.body = {
                 message: "chatroom does not exist."
             }
@@ -185,28 +193,22 @@ router.get('/:username', async ctx => {
     }
 
     // 查詢聊天室成功
-    if (room.userA.username == ctx.session.username) {
+    if (chat.userA.username == username) {
         ctx.body = {
-            messageKey: room.userA.messageKey
+            messageKey: chat.userA.messageKey
         }
     }
     else {
         ctx.body = {
-            messageKey: room.userB.messageKey
+            messageKey: chat.userB.messageKey
         }
     }
 })
 
 // GET /api/chat/<username>/message
 router.get('/:username/message', async ctx => {
-    // 取得要查詢聊天室訊息對象的帳號
-    const username = ctx.params.username
-    // 取得檢索參數
-    let index = ctx.query.index
-    let count = ctx.query.count
-
+    // 如果尚未登入，查詢失敗
     if (!ctx.session.login) {
-        // 尚未登入，查詢聊天室訊息失敗
         ctx.body = {
             message: "not logged in."
         }
@@ -214,9 +216,13 @@ router.get('/:username/message', async ctx => {
         return
     }
 
-    let user = await User.findOneByUsername(username)
-    if (!user) {
-        // 使用者不存在，查詢聊天室訊息失敗
+    const username = ctx.session.username
+    const oppositeUsername = ctx.params.username
+
+    let opposite = await User.findOneByUsername(oppositeUsername)
+
+    // 使用者不存在，查詢聊天室訊息失敗
+    if (!opposite) {
         ctx.body = {
             message: "username does not exist."
         }
@@ -224,11 +230,13 @@ router.get('/:username/message', async ctx => {
         return
     }
 
-    let userA = await User.findOneByUsername(ctx.session.username)
-    let userB = user
-    let rooms = await Chat.findByUsernames(userA.username, userB.username)
-    if (!rooms.length) {
-        // 聊天室不存在，查詢聊天室訊息失敗
+    let userA = await User.findOneByUsername(username)
+    let userB = opposite
+
+    let chats = await Chat.findByUsernames(userA.username, userB.username)
+
+    // 聊天室不存在，查詢聊天室訊息失敗
+    if (!chats.length) {
         ctx.body = {
             message: "chatroom does not exist."
         }
@@ -236,11 +244,11 @@ router.get('/:username/message', async ctx => {
         return
     }
 
-    let room = rooms[0]
+    let chat = chats[0]
 
-    if (!room.visibility) {
-        // 聊天室不可見，查詢聊天室訊息失敗
-        if (room.userB.username == ctx.session.username) {
+    // 聊天室不可見，查詢聊天室訊息失敗
+    if (!chat.visibility) {
+        if (chat.userB.username == username) {
             ctx.body = {
                 message: "chatroom does not exist."
             }
@@ -249,45 +257,25 @@ router.get('/:username/message', async ctx => {
         }
     }
 
-    let messages = room.messages
+    let messages = chat.messages
 
-    // 設定預設的檢索條件
-    index = index || messages.length
-    count = count || 1
+    // 取得檢索條件
+    const index = ctx.query.index || messages.length
+    const count = ctx.query.count || 1
 
     // 取出特定範圍的訊息
     messages = messages.slice(Math.max(0, index - count), index)
 
-    let result = []
-    messages.forEach(message => {
-        result.push({
-            id: message.id,
-            sender: message.sender,
-            type: message.type,
-            content: message.content,
-            options: message.options,
-            // Getter 是否存在待確認
-            timestamp: message._timestamp
-        })
-    });
-
     // 查詢聊天室訊息成功
     ctx.body = {
-        messages: result
+        messages
     }
 })
 
 // POST /api/chat/<username>/message
 router.post('/:username/message', async ctx => {
-    // 取得要發送訊息對象的帳號
-    const username = ctx.params.username
-    // 取得要發送的訊息資訊
-    const type = ctx.request.body.type
-    const content = ctx.request.body.content
-    const options = ctx.request.body.options
-
+    // 如果尚未登入，發送訊息失敗
     if (!ctx.session.login) {
-        // 尚未登入，發送訊息失敗
         ctx.body = {
             message: "not logged in."
         }
@@ -295,9 +283,13 @@ router.post('/:username/message', async ctx => {
         return
     }
 
-    let user = await User.findOneByUsername(username)
-    if (!user) {
-        // 使用者不存在，發送訊息失敗
+    const username = ctx.session.username
+    const oppositeUsername = ctx.params.username
+
+    let opposite = await User.findOneByUsername(oppositeUsername)
+
+    // 使用者不存在，發送訊息失敗
+    if (!opposite) {
         ctx.body = {
             message: "username does not exist."
         }
@@ -305,11 +297,13 @@ router.post('/:username/message', async ctx => {
         return
     }
 
-    let userA = await User.findOneByUsername(ctx.session.username)
-    let userB = user
-    let rooms = await Chat.findByUsernames(userA.username, userB.username)
-    if (!rooms.length) {
-        // 聊天室不存在，發送訊息失敗
+    let userA = await User.findOneByUsername(username)
+    let userB = opposite
+
+    let chats = await Chat.findByUsernames(userA.username, userB.username)
+
+    // 聊天室不存在，發送訊息失敗
+    if (!chats.length) {
         ctx.body = {
             message: "chatroom does not exist."
         }
@@ -317,11 +311,11 @@ router.post('/:username/message', async ctx => {
         return
     }
 
-    let room = rooms[0]
+    let chat = chats[0]
 
-    if (!room.visibility) {
-        // 聊天室不可見，發送訊息失敗
-        if (room.userB.username == ctx.session.username) {
+    // 聊天室不可見，發送訊息失敗
+    if (!chat.visibility) {
+        if (chat.userB.username == username) {
             ctx.body = {
                 message: "chatroom does not exist."
             }
@@ -329,28 +323,22 @@ router.post('/:username/message', async ctx => {
             return
         }
         else {
-            room.visibility = true
+            chat.visibility = true
+            chat.save() // TODO: 不確定是否有必要
         }
     }
 
-    // 發送訊息成功
-    let id = room.messages.length + 1
-
-    let sender = ctx.session.username
-
-    let timestamp = new Date()
-
+    // 發送訊息
     let message = {
-        id,
-        sender,
-        type,
-        content,
-        options,
-        timestamp
+        id: chat.messages.length + 1,
+        sender: ctx.session.username,
+        type: ctx.request.body.type,
+        content: ctx.request.body.content,
+        options: ctx.request.body.options,
+        timestamp: new Date(),
     }
-
-    await room.messages.push(message)
-    await room.save()
+    await chat.messages.push(message)
+    await chat.save()
 
 
     // 如果雙方有 Socket.io 存在就通知
@@ -365,9 +353,8 @@ router.post('/:username/message', async ctx => {
                 socketid
             })
             socket.emit('message', {
-                id,
-                // 之後會改名叫做 username
-                sender: userB.username
+                id: message.id,
+                sender: userB.username  // 之後會把 key 改為 username
             })
         }
     }
@@ -382,9 +369,8 @@ router.post('/:username/message', async ctx => {
                 socketid
             })
             socket.emit('message', {
-                id,
-                // 之後會改名叫做 username
-                sender: userA.username
+                id: message.id,
+                sender: userA.username  // 之後會把 key 改為 username
             })
         }
     }
@@ -394,13 +380,8 @@ router.post('/:username/message', async ctx => {
 
 // GET /api/chat/<username>/message/<messageId>
 router.get('/:username/message/:messageId', async ctx => {
-    // 取得要查看訊息對象的帳號
-    const username = ctx.params.username
-    // 取得要查看訊息的 ID
-    const messageId = ctx.params.messageId
-
+    // 如果尚未登入，查看訊息失敗
     if (!ctx.session.login) {
-        // 尚未登入，查看訊息失敗
         ctx.body = {
             message: "not logged in."
         }
@@ -408,9 +389,13 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-    let user = await User.findOneByUsername(username)
-    if (!user) {
-        // 使用者不存在，查看訊息失敗
+    const username = ctx.session.username
+    const oppositeUsername = ctx.params.username
+
+    let opposite = await User.findOneByUsername(oppositeUsername)
+
+    // 使用者不存在，查看訊息失敗
+    if (!opposite) {
         ctx.body = {
             message: "username does not exist."
         }
@@ -418,10 +403,10 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-    let userA = await User.findOneByUsername(ctx.session.username)
-    let userB = user
-    let rooms = await Chat.findByUsernames(userA.username, userB.username)
-    if (!rooms.length) {
+    let userA = await User.findOneByUsername(username)
+    let userB = opposite
+    let chats = await Chat.findByUsernames(userA.username, userB.username)
+    if (!chats.length) {
         // 聊天室不存在，查看訊息失敗
         ctx.body = {
             message: "chatroom does not exist."
@@ -430,11 +415,11 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-    let room = rooms[0]
+    let chat = chats[0]
 
-    if (!room.visibility) {
-        // 聊天室不可見，查看訊息失敗
-        if (room.userB.username == ctx.session.username) {
+    // 聊天室不可見，查看訊息失敗
+    if (!chat.visibility) {
+        if (chat.userB.username == username) {
             ctx.body = {
                 message: "chatroom does not exist."
             }
@@ -443,8 +428,11 @@ router.get('/:username/message/:messageId', async ctx => {
         }
     }
 
-    if (messageId > room.messages.length) {
-        // 訊息不存在，查看訊息失敗
+    // 取得要查看訊息的 ID
+    const messageId = ctx.params.messageId
+
+    // 訊息不存在，查看訊息失敗
+    if (messageId > chat.messages.length) {
         ctx.body = {
             message: "message does not exist."
         }
@@ -452,19 +440,10 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-
     // 查看訊息成功
-    let message = room.messages[messageId - 1]
+    let message = chat.messages[messageId - 1]
 
-    ctx.body = {
-        id: message.id,
-        sender: message.sender,
-        type: message.type,
-        content: message.content,
-        options: message.options,
-        // Getter 是否存在待確認
-        timestamp: message._timestamp
-    }
+    ctx.body = message
 })
 
 module.exports = router
