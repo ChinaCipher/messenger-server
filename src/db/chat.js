@@ -30,7 +30,7 @@ class Chatroom {
     }
     // 建立聊天室
     static async create(chatdata) {
-        await Chat(chatdata).save()
+        return await Chat.create(chatdata)
     }
     // 更新聊天室訊息
     async postMessage(msgdata) {
