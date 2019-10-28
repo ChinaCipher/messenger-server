@@ -4,7 +4,7 @@ const config = require('./config')
 // 與 db 連接相關設定
 function connect() {
     const userString = `${config.database.username}:${config.database.password}`
-    const connectionString = `mongodb://${userString}@${config.database.host}/${config.database.name}?authSource=admin`
+    const connectionString = `mongodb://${userString}@${config.database.host}/${config.database.name}`
 
     mongoose.connect(connectionString, { useNewUrlParser: true, autoIndex: false })
 
