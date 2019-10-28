@@ -17,23 +17,23 @@ let message = new Schema({
     timestamp: { type: String, default: '' },
 })
 
-// 定義 chatroom 儲存結構
-let chatroom = new Schema({
+// 定義 chat 儲存結構
+let chat = new Schema({
     messages: [message],
     visibility: { type: Boolean, default: false },
     userA: { type: user, index: { unique: true, dropDups: true } },
     userB: { type: user, index: { unique: true, dropDups: true } }
 })
 
-// 對 chatroom 加入靜態方法，讓他被建立成模組後可以直接調用
-chatroom.statics.findByUsersname = function (users, fields) {
+// 對 chat 加入靜態方法，讓他被建立成模組後可以直接調用
+chat.statics.findByUsersname = function (users, fields) {
     return this.findOne({
         'userA.username': users.userA.username,
         'userB.username': users.userB.username
     }, fields)
 }
 
-// 建立 chatroom 模組
-const model = mongoose.model('chatroom', chatroom)
+// 建立 chat 模組
+const model = mongoose.model('chat', chat)
 
 module.exports = model

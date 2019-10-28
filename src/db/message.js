@@ -1,4 +1,4 @@
-const chatrooms = require('../models/chatrooms')
+const Chat = require('../models/chat')
 
 class Message {
     constructor(msgdata, usernameA, usernameB) {
@@ -68,7 +68,7 @@ class Message {
 
     static async _update(value, usernameA, usernameB, id, option) {
         let o = "messages.$." + option
-        await chatrooms.update({ "userA.username": usernameA, "userB.username": usernameB, "messages.id": id },
+        await Chat.update({ "userA.username": usernameA, "userB.username": usernameB, "messages.id": id },
             { "$set": { [o]: value } })
     }
 }

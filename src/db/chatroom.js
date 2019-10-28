@@ -1,4 +1,4 @@
-const chatrooms = require('../models/chatrooms')
+const Chat = require('../models/chat')
 const Message = require('./message')
 
 class Chatroom {
@@ -22,12 +22,12 @@ class Chatroom {
     static async find(usernameA, usernameB, fields) {
         let chatroomList = null
         if (usernameB === null) {
-            chatroomList = await chatrooms.find({
+            chatroomList = await Chat.find({
                 "$or": [{ "userA.username": usernameA }, { "userB.username": usernameA }]
             }, fields)
         }
         else {
-            chatroomList = await chatrooms.find({
+            chatroomList = await Chat.find({
                 "$or": [{
                     "$and": [{ "userA.username": usernameA }, { "userB.username": usernameB }]
                 }, {
@@ -45,17 +45,17 @@ class Chatroom {
     }
     // 建立聊天室
     static async create(chatdata) {
-        await chatrooms(chatdata).save()
+        await Chat(chatdata).save()
     }
     // 更新聊天室訊息
     async postMessage(msgdata) {
-        let chatdata = await chatrooms.findByUsersname({
+        let chatdata = await Chat.findByUsersname({
             "userA": this._userA,
             "userB": this._userB
         })
         // if (msgdata["id"] === undefined) msgdata["id"] = chatdata.messages[chatdata.messages.length - 1].id + 1
         await chatdata.update({ "$push": { messages: msgdata } })
-        let newchatdata = await chatrooms.findByUsersname({
+        let newchatdata = await Chat.findByUsersname({
             "userA": this._userA,
             "userB": this._userB
         })
@@ -63,7 +63,7 @@ class Chatroom {
     }
     // 更新聊天室
     static async _update(usernameA, usernameB, value, option) {
-        await chatrooms.update({
+        await Chat.update({
             "$or": [
                 { "$and": [{ "userA.username": usernameA }, { "userB.username": usernameB }] },
                 { "$and": [{ "userA.username": usernameB }, { "userB.username": usernameA }] }
