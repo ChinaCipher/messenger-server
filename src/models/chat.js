@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 
 // 定義 user 儲存結構
 let user = new Schema({
-    username: { type: String, index: true, minlength: 3, maxlength: 30, default: '' },
+    username: { type: String, index: true, minlength: 3, maxlength: 64, default: '' },
     messageKey: { type: String, index: true, default: '' },
 })
 

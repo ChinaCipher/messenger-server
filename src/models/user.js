@@ -3,8 +3,8 @@ const Schema = mongoose.Schema
 
 // 定義 user 結構
 const user = new Schema({
-    username: { type: String, index: { unique: true, dropDups: true }, minlength: 3, maxlength: 30 },
-    password: { type: String, match: /\w+/, index: true },
+    username: { type: String, index: { unique: true, dropDups: true }, minlength: 3, maxlength: 64 },
+    password: { type: String, match: /\w+/, index: true, minlength: 8, maxlength: 8964 },
     avatar: { type: String, index: true, default: '' },
     nickname: { type: String, index: true, default: '' },
     privateKey: { type: String, index: true },

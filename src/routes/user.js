@@ -25,10 +25,19 @@ router.post('/', async ctx => {
         return
     }
 
-    if (!secret || (secret.length < 8) || (secret.length > 30)) {
+    if ((username.length < 3) || (username.length > 64)) {
+        // 帳號長度不符合要求，註冊失敗
+        ctx.body = {
+            message: "username must be longer than 3 and shorter than 64."
+        }
+        ctx.status = 401
+        return
+    }
+
+    if (!secret || (secret.length < 8) || (secret.length > 8964)) {
         // 密碼長度不符合要求，註冊失敗
         ctx.body = {
-            message: "password must be longer than 3 and shorter than 30."
+            message: "password must be longer than 8 and shorter than 8964."
         }
         ctx.status = 401
         return
