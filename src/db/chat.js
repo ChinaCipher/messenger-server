@@ -33,18 +33,12 @@ class Chatroom {
         return await Chat.create(chatdata)
     }
     // 更新聊天室訊息
-    async postMessage(msgdata) {
-        let chatdata = await Chat.findByUsersname({
-            "userA": this._userA,
-            "userB": this._userB
-        })
-        // if (msgdata["id"] === undefined) msgdata["id"] = chatdata.messages[chatdata.messages.length - 1].id + 1
-        await chatdata.update({ "$push": { messages: msgdata } })
-        let newchatdata = await Chat.findByUsersname({
-            "userA": this._userA,
-            "userB": this._userB
-        })
-        this._messages.push(new Message(newchatdata.messages, this._userA.username, this._userB.username))
+    async postMessage(message) {
+        let chat = (await Chat.findByUsernames(this._userA.username, this._userB.username))[0]
+        await chat.messages.push(message)
+        await chat.save()
+
+        this._messages.push(new Message(chat.messages, this._userA.username, this._userB.username))
     }
     // 更新聊天室
     static async _update(usernameA, usernameB, value, option) {

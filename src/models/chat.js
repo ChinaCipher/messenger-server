@@ -43,13 +43,6 @@ chat.statics.findByUsernames = function (usernameA, usernameB) {
         })
     }
 }
-// TODO: Remove it
-chat.statics.findByUsersname = function (users, fields) {
-    return this.findOne({
-        'userA.username': users.userA.username,
-        'userB.username': users.userB.username
-    }, fields)
-}
 
 // 建立 chat 模組
 const model = mongoose.model('chat', chat)
