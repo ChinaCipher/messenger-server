@@ -12,6 +12,6 @@ const user = new Schema({
 })
 
 // 建立 user 模型
-const model = mongoose.model('users', user)
+const model = mongoose.model('user', user)
 
 module.exports = model
