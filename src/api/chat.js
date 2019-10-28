@@ -1,7 +1,7 @@
 const crypto = require('crypto')
 const Router = require('koa-router')
 
-const User = require('../db/user')
+const User = require('../models/user')
 const Chatroom = require('../db/chatroom')
 const ecies = require('../util/ecies')
 
@@ -466,4 +466,4 @@ router.get('/:username/message/:messageId', async ctx => {
     }
 })
 
-module.exports = router 
+module.exports = router

@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs')
 const Router = require('koa-router')
 
-const User = require('../db/user')
+const User = require('../models/user')
 const aes = require('../util/aes')
 const ecies = require('../util/ecies')
 const sha256 = require('../util/sha256')

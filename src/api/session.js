@@ -2,7 +2,7 @@ const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 const Router = require('koa-router')
 
-const User = require('../db/user')
+const User = require('../models/user')
 
 const router = new Router()
 
@@ -125,4 +125,4 @@ router.delete('/', async ctx => {
     ctx.status = 204
 })
 
-module.exports = router 
+module.exports = router
