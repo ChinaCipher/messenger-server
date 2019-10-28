@@ -2,7 +2,7 @@ const crypto = require('crypto')
 const Router = require('koa-router')
 
 const User = require('../models/user')
-const Chat = require('../db/chat')
+const Chat = require('../models/chat')
 const ecies = require('../util/ecies')
 
 const router = new Router()
@@ -349,7 +349,8 @@ router.post('/:username/message', async ctx => {
         timestamp
     }
 
-    await room.postMessage(message)
+    await room.messages.push(message)
+    await room.save()
 
 
     // 如果雙方有 Socket.io 存在就通知
