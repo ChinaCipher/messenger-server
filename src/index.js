@@ -53,6 +53,6 @@ app.use(router.routes()).use(router.allowedMethods())
 
 const server = socket.setupServer(app)
 
-server.listen(config.app.port || 8787, () => {
-    console.log(`Server is running on http://localhost:${config.app.port || 8787}.`)
+server.listen(config.app.port, () => {
+    console.log(`Server is running on http://localhost:${config.app.port}.`)
 })
