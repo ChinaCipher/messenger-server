@@ -7,7 +7,7 @@ const statics = require('koa-static')
 const session = require('koa-session')
 
 const config = require('./config')
-const db = require('./db/server')
+const database = require('./database')
 const api = require('./route')
 const socket = require('./socket')
 
@@ -15,7 +15,8 @@ const socket = require('./socket')
 const app = new Koa()
 const router = new Router()
 
-db.connect()
+// 連接資料庫
+database.connect()
 
 app.keys = config.app.keys
 

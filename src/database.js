@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const config = require('../config')
+const config = require('./config')
 // 與 db 連接相關設定
 function connect() {
     const userString = `${config.database.username}:${config.database.password}`
