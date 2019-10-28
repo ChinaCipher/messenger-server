@@ -19,7 +19,7 @@ class Chatroom {
      * @param {String} fields
      */
     // 搜尋聊天室
-    static async find(usernameA, usernameB) {
+    static async findByUsernames(usernameA, usernameB) {
         let chats = await Chat.findByUsernames(usernameA, usernameB)
 
         let result = []
