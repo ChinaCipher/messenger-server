@@ -6,10 +6,11 @@ const logger = require('koa-logger')
 const statics = require('koa-static')
 const session = require('koa-session')
 
+const socket = require('./middlewares/socket')
+
 const config = require('./config')
 const database = require('./database')
 const api = require('./route')
-const socket = require('./socket')
 
 
 const app = new Koa()
