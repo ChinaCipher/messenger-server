@@ -45,7 +45,7 @@ router.post('/', async ctx => {
         // 將明文密碼採用 bcrypt 雜湊後儲存
         password: await bcrypt.hash(secret, '$2b$10$' + sha256.hash(username).slice(0, 22)),
         nickname: username,
-        avatar: 'img/default_avatar.png',
+        avatar: 'https://imgur.com/Kf3m1o7.png',
         publicKey: pair.publicKey,
         // 將 EC 私鑰採用 AES 加密後儲存
         privateKey: aes.encrypt(pair.privateKey, key, iv)
