@@ -25,7 +25,25 @@ let chat = new Schema({
     userB: { type: user, index: { unique: true, dropDups: true } }
 })
 
-// 對 chat 加入靜態方法，讓他被建立成模組後可以直接調用
+// 定義 chat 的 static 方法
+chat.statics.findByUsernames = function (usernameA, usernameB) {
+    if (usernameB != null) {
+        // 找出指定兩使用者的聊天室
+        return this.find({
+            '$or': [
+                { 'userA.username': usernameA, 'userB.username': usernameB },
+                { 'userA.username': usernameB, 'userB.username': usernameA },
+            ]
+        })
+    }
+    else {
+        // 找出指定使用者的所有聊天室
+        return this.find({
+            '$or': [{ 'userA.username': usernameA }, { 'userB.username': usernameA }]
+        })
+    }
+}
+// TODO: Remove it
 chat.statics.findByUsersname = function (users, fields) {
     return this.findOne({
         'userA.username': users.userA.username,

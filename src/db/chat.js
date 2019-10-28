@@ -19,28 +19,13 @@ class Chatroom {
      * @param {String} fields
      */
     // 搜尋聊天室
-    static async find(usernameA, usernameB, fields) {
-        let chatroomList = null
-        if (usernameB === null) {
-            chatroomList = await Chat.find({
-                "$or": [{ "userA.username": usernameA }, { "userB.username": usernameA }]
-            }, fields)
-        }
-        else {
-            chatroomList = await Chat.find({
-                "$or": [{
-                    "$and": [{ "userA.username": usernameA }, { "userB.username": usernameB }]
-                }, {
-                    "$and": [{ "userA.username": usernameB }, { "userB.username": usernameA }]
-                }]
-            }, fields)
-        }
+    static async find(usernameA, usernameB) {
+        let chats = await Chat.findByUsernames(usernameA, usernameB)
 
         let result = []
-        chatroomList.forEach((chatroom) => {
-            result.push(new Chatroom(chatroom))
+        chats.forEach((chat) => {
+            result.push(new Chatroom(chat))
         })
-
         return result
     }
     // 建立聊天室
