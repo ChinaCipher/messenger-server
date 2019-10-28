@@ -23,7 +23,7 @@ yarn build
 
 4. 运行于产品模式
 ```bash
-yarn serve
+yarn start
 ```
 
 ## 许可证
