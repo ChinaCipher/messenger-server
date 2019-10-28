@@ -1,9 +1,9 @@
 const Router = require('koa-router')
 
-const test = require('./api/test')
-const chat = require('./api/chat')
-const user = require('./api/user')
-const session = require('./api/session')
+const test = require('./routes/test')
+const chat = require('./routes/chat')
+const user = require('./routes/user')
+const session = require('./routes/session')
 
 const router = new Router()
 
