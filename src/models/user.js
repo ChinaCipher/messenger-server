@@ -11,11 +11,6 @@ const user = new Schema({
     publicKey: { type: String, index: true },
 })
 
-// 定義 user 的 static 方法
-user.statics.find = function (username) {
-    return this.findOne({ username: username })
-}
-
 // 建立 user 模型
 const model = mongoose.model('users', user)
 

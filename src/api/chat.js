@@ -35,10 +35,10 @@ router.get('/', async ctx => {
         // 取得對方使用者物件
         let user = null
         if (room.userA.username == ctx.session.username) {
-            user = await User.find(room.userB.username)
+            user = await User.findOne({ username: room.userB.username })
         }
         else {
-            user = await User.find(room.userA.username)
+            user = await User.findOne({ username: room.userA.username })
         }
 
         // 加入結果陣列中
@@ -69,7 +69,7 @@ router.post('/', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOne({ username })
     if (!user) {
         // 使用者不存在，建立聊天室失敗
         ctx.body = {
@@ -80,7 +80,7 @@ router.post('/', async ctx => {
     }
 
     // 取得聊天雙方的使用者物件
-    let userA = await User.find(ctx.session.username)
+    let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
     let rooms = await Chatroom.find(userA.username, userB.username)
     if (rooms.length) {
@@ -149,7 +149,7 @@ router.get('/:username', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOne({ username })
     if (!user) {
         // 使用者不存在，查詢聊天室失敗
         ctx.body = {
@@ -159,7 +159,7 @@ router.get('/:username', async ctx => {
         return
     }
 
-    let userA = await User.find(ctx.session.username)
+    let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
     let rooms = await Chatroom.find(userA.username, userB.username)
     if (!rooms.length) {
@@ -214,7 +214,7 @@ router.get('/:username/message', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOne({ username })
     if (!user) {
         // 使用者不存在，查詢聊天室訊息失敗
         ctx.body = {
@@ -224,7 +224,7 @@ router.get('/:username/message', async ctx => {
         return
     }
 
-    let userA = await User.find(ctx.session.username)
+    let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
     let rooms = await Chatroom.find(userA.username, userB.username)
     if (!rooms.length) {
@@ -295,7 +295,7 @@ router.post('/:username/message', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOne({ username })
     if (!user) {
         // 使用者不存在，發送訊息失敗
         ctx.body = {
@@ -305,7 +305,7 @@ router.post('/:username/message', async ctx => {
         return
     }
 
-    let userA = await User.find(ctx.session.username)
+    let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
     let rooms = await Chatroom.find(userA.username, userB.username)
     if (!rooms.length) {
@@ -407,7 +407,7 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOne({ username })
     if (!user) {
         // 使用者不存在，查看訊息失敗
         ctx.body = {
@@ -417,7 +417,7 @@ router.get('/:username/message/:messageId', async ctx => {
         return
     }
 
-    let userA = await User.find(ctx.session.username)
+    let userA = await User.findOne({ username: ctx.session.username })
     let userB = user
     let rooms = await Chatroom.find(userA.username, userB.username)
     if (!rooms.length) {
