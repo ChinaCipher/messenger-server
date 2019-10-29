@@ -2,7 +2,7 @@ const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 const Router = require('koa-router')
 
-const User = require('../db/user')
+const User = require('../models/user')
 
 const router = new Router()
 
@@ -12,11 +12,13 @@ router.get('/', async ctx => {
     // 用 bcrypt 產生 salt 作為驗證碼
     ctx.session.code = await bcrypt.genSalt(10)
 
-    if (ctx.session.login) {
-        let user = await User.find(ctx.session.username)
+    const username = ctx.session.username
 
+    if (ctx.session.login) {
+        let user = await User.findOneByUsername(username)
+
+        // 如果已登入且找得到該使用者，就順便回傳該使用者資訊
         if (user) {
-            // 如果已登入且找得到該使用者，就順便回傳該使用者資訊
             ctx.body = {
                 code: ctx.session.code,
                 profile: {
@@ -47,8 +49,8 @@ router.post('/', async ctx => {
     const username = ctx.request.body.username
     const password = ctx.request.body.password
 
+    // 沒有取得過驗證碼，登入失敗
     if (!ctx.session.code) {
-        // 沒有取得過驗證碼，登入失敗
         ctx.body = {
             message: "session code does not exist."
         }
@@ -60,9 +62,10 @@ router.post('/', async ctx => {
     let salt = ctx.session.code
     ctx.session.code = undefined
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
+
+    // 沒有這個使用者，登入失敗
     if (!user) {
-        // 沒有這個使用者，登入失敗
         ctx.body = {
             message: "username does not exist."
         }
@@ -71,8 +74,9 @@ router.post('/', async ctx => {
     }
 
     let result = `${salt}${password.slice(29, 60)}`
+
+    // 密碼使用 bcrypt 雜湊後的結果不符合，登入失敗
     if (!await bcrypt.compare(user.password, result)) {
-        // 密碼使用 bcrypt 雜湊後的結果不符合，登入失敗
         ctx.body = {
             message: "wrong password."
         }
@@ -101,8 +105,8 @@ router.delete('/', async ctx => {
     // 清除驗證碼，確保每次登入都不同
     ctx.session.code = undefined
 
+    // 尚未登入，登出失敗
     if (!ctx.session.login) {
-        // 尚未登入，登出失敗
         ctx.body = {
             message: "not logged in."
         }
@@ -110,10 +114,12 @@ router.delete('/', async ctx => {
         return
     }
 
-    if (ctx.sockets[ctx.session.username]) {
+    const username = ctx.session.username
+
+    if (ctx.sockets[username]) {
         // 如果有相同 session 的 socket.io 存在就斷開
-        if (ctx.sockets[ctx.session.username][ctx.session.id]) {
-            ctx.sockets[ctx.session.username][ctx.session.id].disconnect()
+        if (ctx.sockets[username][ctx.session.id]) {
+            ctx.sockets[username][ctx.session.id].disconnect()
         }
     }
 
@@ -125,4 +131,4 @@ router.delete('/', async ctx => {
     ctx.status = 204
 })
 
-module.exports = router 
+module.exports = router

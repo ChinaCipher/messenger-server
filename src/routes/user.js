@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs')
 const Router = require('koa-router')
 
-const User = require('../db/user')
+const User = require('../models/user')
 const aes = require('../util/aes')
 const ecies = require('../util/ecies')
 const sha256 = require('../util/sha256')
@@ -15,7 +15,7 @@ router.post('/', async ctx => {
     const username = ctx.request.body.username
     const secret = ctx.request.body.secret
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (user) {
         // 已經有這個使用者，註冊失敗
         ctx.body = {
@@ -25,10 +25,19 @@ router.post('/', async ctx => {
         return
     }
 
-    if (!secret || (secret.length < 8) || (secret.length > 30)) {
+    if ((username.length < 3) || (username.length > 64)) {
+        // 帳號長度不符合要求，註冊失敗
+        ctx.body = {
+            message: "username must be longer than 3 and shorter than 64."
+        }
+        ctx.status = 401
+        return
+    }
+
+    if (!secret || (secret.length < 8) || (secret.length > 8964)) {
         // 密碼長度不符合要求，註冊失敗
         ctx.body = {
-            message: "password must be longer than 3 and shorter than 30."
+            message: "password must be longer than 8 and shorter than 8964."
         }
         ctx.status = 401
         return
@@ -45,7 +54,7 @@ router.post('/', async ctx => {
         // 將明文密碼採用 bcrypt 雜湊後儲存
         password: await bcrypt.hash(secret, '$2b$10$' + sha256.hash(username).slice(0, 22)),
         nickname: username,
-        avatar: 'img/default_avatar.png',
+        avatar: 'https://imgur.com/Kf3m1o7.png',
         publicKey: pair.publicKey,
         // 將 EC 私鑰採用 AES 加密後儲存
         privateKey: aes.encrypt(pair.privateKey, key, iv)
@@ -64,7 +73,7 @@ router.post('/', async ctx => {
     }
 
     // 註冊成功
-    user = await User.find(username)
+    user = await User.findOneByUsername(username)
 
     ctx.body = {
         avatar: user.avatar,
@@ -78,7 +87,7 @@ router.post('/', async ctx => {
 router.get('/:username', async ctx => {
     const username = ctx.params.username
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (!user) {
         // 使用者不存在，查詢使用者失敗
         ctx.body = {
@@ -113,7 +122,7 @@ router.patch('/:username', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (!user) {
         // 使用者不存在，更新資訊失敗
         ctx.body = {
@@ -166,7 +175,7 @@ router.patch('/:username/password', async ctx => {
         return
     }
 
-    let user = await User.find(username)
+    let user = await User.findOneByUsername(username)
     if (!user) {
         // 使用者不存在，更新密碼失敗
         ctx.body = {

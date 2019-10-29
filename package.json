@@ -30,6 +30,6 @@
   "scripts": {
     "dev": "nodemon --exec babel-node src/index.js --allow-cors",
     "build": "babel src --out-dir dist",
-    "serve": "node dist"
+    "start": "node dist"
   }
 }

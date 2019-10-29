@@ -1,7 +1,7 @@
 module.exports = {
     app: {
         port: 8787,
-        keys: ["some secret hurr"]
+        keys: ["some secret"]
     },
     session: {
         key: "koa:sess",
@@ -9,7 +9,8 @@ module.exports = {
     },
     database: {
         host: "localhost:27017",
-        user: "XI",
-        pswd: "ChinaNumberOne"
+        username: "XI",
+        password: "ChinaNumberOne",
+        name: "ChinaCipherMessenger"
     }
 }
